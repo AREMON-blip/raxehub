@@ -86,15 +86,10 @@ export async function ensureIdentity(mountEl = null) {
   if (PK) {
     const clerk = await loadClerk()
     if (!clerk.user) {
-      if (mountEl) {
-        mountEl.innerHTML = '<div id="clerk-signin" style="display:flex;justify-content:center;padding-block:24px"></div>'
-        clerk.mountSignIn(mountEl.querySelector('#clerk-signin'), {
-          forceRedirectUrl: '/admin',
-          fallbackRedirectUrl: '/admin',
-        })
-      } else {
-        await clerk.redirectToSignIn({ redirectUrl: location.href })
-      }
+      await clerk.redirectToSignIn({
+        signInFallbackRedirectUrl: '/admin',
+        signInForceRedirectUrl: '/admin',
+      })
       return null
     }
     return { email: clerk.user.primaryEmailAddress?.emailAddress || '', dev: false }
