@@ -13,7 +13,8 @@ function clerkSignIn(publishableKey: string, request: Request): string | null {
     return null
   }
   if (!host.includes('.')) return null
-  const url = new URL(`https://${host}/sign-in`)
+  const portalHost = host.replace(/\.clerk\.accounts\.dev$/, '.accounts.dev')
+  const url = new URL(`https://${portalHost}/sign-in`)
   url.searchParams.set('redirect_url', new URL('/admin', request.url).toString())
   return url.toString()
 }
