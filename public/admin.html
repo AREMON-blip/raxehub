@@ -50,6 +50,21 @@
         </div>
         <div><button class="btn btn-primary" type="submit">Unggah rilis</button></div>
       </form>
+
+      <form id="shot-form" class="card" style="margin-top:24px;display:grid;gap:20px">
+        <div>
+          <span class="label">ADMIN / TAMPILAN</span>
+          <h2 class="h2" style="margin-top:8px">Unggah Screenshot</h2>
+        </div>
+        <div class="form-grid">
+          <div class="field"><label class="label" for="s-slug">Slug App</label><input id="s-slug" name="slug" required placeholder="kroma"></div>
+          <div class="field"><label class="label" for="s-caption">Caption (opsional)</label><input id="s-caption" name="caption" placeholder="Beranda player"></div>
+          <div class="field"><label class="label" for="s-sort">Urutan</label><input id="s-sort" name="sort" type="number" value="0"></div>
+          <div class="field"><label class="label" for="s-file">Gambar Screenshot (PNG/JPG/WebP)</label><input id="s-file" name="image" type="file" accept="image/png,image/jpeg,image/webp" required></div>
+        </div>
+        <p class="status-line" data-shot-status aria-live="polite"></p>
+        <div><button class="btn btn-secondary" type="submit">Unggah screenshot</button></div>
+      </form>
     </section>
     </div>
   </main>

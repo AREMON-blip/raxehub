@@ -104,6 +104,42 @@ async function bootAdmin(identity) {
       submit.disabled = false
     }
   })
+
+  const shotForm = document.getElementById('shot-form')
+  const shotStatus = (msg) => { const el = $('[data-shot-status]'); if (el) el.textContent = msg }
+  if (shotForm) {
+    const shotSubmit = shotForm.querySelector('button[type="submit"]')
+    shotForm.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      const file = shotForm.image.files[0]
+      if (!file) return shotStatus('Pilih gambar screenshot terlebih dahulu.')
+      const slug = shotForm.slug.value.trim().toLowerCase()
+      shotSubmit.disabled = true
+      try {
+        shotStatus('Mencari app…')
+        const existing = await listApps(identity, 'apk')
+        const found = existing.find((app) => app.slug === slug)
+        if (!found) throw new Error(`Slug "${slug}" tidak ditemukan.`)
+        shotStatus('Meminta presign R2…')
+        const signed = await api(`/api/admin/upload-screenshot/${encodeURIComponent(found.id)}`, {
+          identity, method: 'POST',
+          body: {
+            fileName: file.name,
+            caption: shotForm.caption.value.trim() || null,
+            sort: Number(shotForm.sort.value) || 0,
+          },
+        })
+        shotStatus('Mengunggah gambar ke R2…')
+        await putFile(signed.uploadUrl, file, () => {})
+        shotStatus(`Screenshot tersimpan: ${signed.key}`)
+        shotForm.reset()
+      } catch (error) {
+        shotStatus(error.message || 'Gagal mengunggah screenshot.')
+      } finally {
+        shotSubmit.disabled = false
+      }
+    })
+  }
 }
 
 const gate = document.getElementById('admin-gate')

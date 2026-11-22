@@ -147,7 +147,9 @@ function apkDetail(app, detail) {
   const screenshots = detail?.screenshots || []
   const latest = versions[0] || null
   const shots = screenshots.length
-    ? screenshots.map((shot) => `<div class="shot"><span>${esc(shot.caption || 'Tampilan')}</span></div>`).join('')
+    ? screenshots.map((shot) => shot.url
+        ? `<figure class="shot" style="padding:0;overflow:hidden;position:relative;margin:0"><img src="${esc(shot.url)}" alt="${esc(shot.caption || app.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">${shot.caption ? `<figcaption style="position:absolute;inset:auto 0 0 0;padding:8px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.78));color:#EDEDED">${esc(shot.caption)}</figcaption>` : ''}</figure>`
+        : `<div class="shot"><span>${esc(shot.caption || 'Tampilan')}</span></div>`).join('')
     : '<div class="shot"><span>Belum ada screenshot</span></div>'
   const changelog = versions.length
     ? versions.map((item) => `<div class="version-row">
