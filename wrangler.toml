@@ -1,0 +1,7 @@
+name = "raxehub"
+compatibility_date = "2026-11-22"
+pages_build_output_dir = "public"
+
+[[r2_buckets]]
+binding = "RAXEHUB_BUCKET"
+bucket_name = "raxehub-apk"

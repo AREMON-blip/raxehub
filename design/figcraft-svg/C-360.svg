@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="900" viewBox="0 0 360 900"><rect x="0" y="0" width="360" height="900" rx="0" fill="#161513"/><rect x="0" y="0" width="360" height="56" rx="0" fill="#161513"/><text x="16" y="35" text-anchor="start" font-family="Plus Jakarta Sans" font-size="16" font-weight="600" fill="#EFE9DE">RaxeHub</text><text x="118" y="35" text-anchor="start" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" fill="#AAA398">Home</text><text x="172" y="35" text-anchor="start" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" fill="#EFE9DE">Library</text><text x="344" y="35" text-anchor="end" font-family="Plus Jakarta Sans" font-size="14" font-weight="400" fill="#AAA398">Keluar</text><line x1="172" y1="50" x2="222" y2="50" stroke="#EFE9DE" stroke-width="2" opacity="1"/><line x1="0" y1="56" x2="360" y2="56" stroke="#3A3732" stroke-width="1" opacity="1"/><g id="c360-mark" transform="translate(16,72) scale(0.125000)">
+  <defs>
+    <radialGradient id="c360-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0c1626"/>
+      <stop offset="55%" stop-color="#070c14"/>
+      <stop offset="100%" stop-color="#030508"/>
+    </radialGradient>
+    <linearGradient id="c360-stem" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF"/>
+      <stop offset="35%" stop-color="#0077FE"/>
+      <stop offset="100%" stop-color="#0044B8"/>
+    </linearGradient>
+    <linearGradient id="c360-bowl" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5DFBFF"/>
+      <stop offset="40%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#0094D4"/>
+    </linearGradient>
+    <linearGradient id="c360-leg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E879F9"/>
+      <stop offset="30%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#6B21A8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#c360-bg)"/>
+  <circle cx="256" cy="256" r="212" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-opacity="0.95"/>
+  <path d="M194 132 V332 L146 380 V180 L194 132 Z" fill="url(#c360-stem)"/>
+  <polygon points="194,132 188,132 146,174 146,180 150,180 194,136" fill="#FFFFFF" opacity="0.95"/>
+  <line x1="146" y1="180" x2="146" y2="380" stroke="#70B8FF" stroke-width="1.8" stroke-opacity="0.6"/>
+  <line x1="146" y1="380" x2="194" y2="332" stroke="#93C5FD" stroke-width="2.5" stroke-opacity="0.9"/>
+  <path fill-rule="evenodd" d="M210 132 H318 L360 174 V204 L318 246 H210 V132 Z M210 170 H298 L320 192 L298 214 H210 V170 Z" fill="url(#c360-bowl)"/>
+  <path d="M210 132 H318 L360 174 L357 177 L316 136 H210 V132 Z" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M210 170 H298 L320 192 L317 194 L296 173 H210 V170 Z" fill="#E6FFFF" opacity="0.85"/>
+  <line x1="360" y1="204" x2="318" y2="246" stroke="#004D73" stroke-width="2.5" stroke-opacity="0.8"/>
+  <polygon points="210,254 262,254 356,348 330,374" fill="url(#c360-leg)"/>
+  <line x1="262" y1="254" x2="356" y2="348" stroke="#00FFFF" stroke-width="2.5" stroke-opacity="0.95"/>
+  <line x1="330" y1="374" x2="356" y2="348" stroke="#00E5FF" stroke-width="2.5" stroke-opacity="0.9"/>
+  <line x1="210" y1="254" x2="262" y2="254" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.9"/>
+  <line x1="210" y1="254" x2="330" y2="374" stroke="#F5D0FE" stroke-width="1.8" stroke-opacity="0.8"/>
+</g><text x="92" y="100" text-anchor="start" font-family="Plus Jakarta Sans" font-size="22" font-weight="500" fill="#EFE9DE">RaxeHub</text><text x="92" y="122" text-anchor="start" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#AAA398">Manifest rilis</text><text x="16" y="160" text-anchor="start" font-family="Plus Jakarta Sans" font-size="22" font-weight="400" fill="#EFE9DE">Unduh dari bengkel,</text><text x="16" y="188" text-anchor="start" font-family="Plus Jakarta Sans" font-size="22" font-weight="400" fill="#EFE9DE">bukan dari toko.</text><rect x="16" y="216" width="328" height="168" rx="16" fill="#12110F"/><rect x="17" y="217" width="326" height="166" rx="15" fill="#262421" stroke="#3A3732" stroke-width="1"/><text x="32" y="244" text-anchor="start" font-family="JetBrains Mono" font-size="12" font-weight="400" fill="#C4A574">01</text><rect x="32" y="256" width="48" height="48" rx="8" fill="#262421" stroke="#3A3732" stroke-width="1"/><rect x="42.56" y="266.56" width="7.68" height="26.880000000000003" rx="1" fill="#EFE9DE"/><rect x="50.24" y="266.56" width="16.32" height="5.76" rx="1" fill="#EFE9DE"/><rect x="50.24" y="287.68" width="16.32" height="5.76" rx="1" fill="#EFE9DE"/><polygon points="53.120000000000005,277.12 69.44,272.32 69.44,280.0" fill="#EFE9DE"/><text x="96" y="276" text-anchor="start" font-family="Plus Jakarta Sans" font-size="18" font-weight="500" fill="#EFE9DE">KROMA</text><text x="96" y="298" text-anchor="start" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#AAA398">Player musik pribadi</text><rect x="32" y="324" width="148" height="48" rx="8" fill="#EFE9DE"/><line x1="33" y1="325" x2="179" y2="325" stroke="#FFFFFF" stroke-width="1" opacity="0.18"/><text x="106.0" y="353.0" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="14" font-weight="500" fill="#1F1B16">Buka detail</text><rect x="29" y="321" width="154" height="54" rx="10" fill="none" stroke="#EFE9DE" stroke-width="2"/><rect x="16" y="396" width="328" height="120" rx="16" fill="#12110F"/><rect x="17" y="397" width="326" height="118" rx="15" fill="#1C1A18" stroke="#3A3732" stroke-width="1"/><text x="32" y="424" text-anchor="start" font-family="JetBrains Mono" font-size="12" font-weight="400" fill="#C4A574">02</text><rect x="32" y="436" width="48" height="48" rx="8" fill="#262421" stroke="#3A3732" stroke-width="1"/><ellipse cx="56.0" cy="462.0" rx="13.440000000000001" ry="15.456" fill="none" stroke="#EFE9DE" stroke-width="2"/><ellipse cx="56.0" cy="454.608" rx="9.6768" ry="2.9568000000000003" fill="none" stroke="#EFE9DE" stroke-width="2"/><text x="96" y="456" text-anchor="start" font-family="Plus Jakarta Sans" font-size="18" font-weight="500" fill="#EFE9DE">Tabungku</text><text x="96" y="478" text-anchor="start" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#AAA398">Tabungan berdasar tujuan</text><rect x="16" y="528" width="328" height="120" rx="16" fill="#12110F"/><rect x="17" y="529" width="326" height="118" rx="15" fill="#1C1A18" stroke="#3A3732" stroke-width="1"/><text x="32" y="556" text-anchor="start" font-family="JetBrains Mono" font-size="12" font-weight="400" fill="#C4A574">03</text><rect x="32" y="568" width="48" height="48" rx="8" fill="#262421" stroke="#3A3732" stroke-width="1"/><path d="M56.0 578.56 L69.44 592.0 L56.0 605.44 L42.56 592.0 Z" fill="none" stroke="#EFE9DE" stroke-width="2"/><line x1="56.0" y1="578.56" x2="56.0" y2="605.44" stroke="#AAA398" stroke-width="1.5" opacity="1"/><text x="96" y="588" text-anchor="start" font-family="Plus Jakarta Sans" font-size="18" font-weight="500" fill="#EFE9DE">GPS Tracker</text><text x="96" y="610" text-anchor="start" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#AAA398">Pelacak lokasi</text><line x1="16" y1="844" x2="344" y2="844" stroke="#3A3732" stroke-width="1" opacity="1"/><text x="16" y="866" text-anchor="start" font-family="Plus Jakarta Sans" font-size="12" font-weight="400" fill="#9A9488">APK belum terverifikasi Google Play.</text><text x="16" y="884" text-anchor="start" font-family="Plus Jakarta Sans" font-size="12" font-weight="400" fill="#9A9488">Aktifkan Install unknown apps.</text></svg>

@@ -1,0 +1,228 @@
+---
+version: "1.1"
+name: RaxeHub
+description: Private workshop. Graphite shelf. Dark only. Home, APK, Web.
+colors:
+  bg: "#141415"
+  card: "#19191B"
+  raised: "#232325"
+  hair: "#2A2A2C"
+  text: "#EDEDED"
+  secondary: "#A1A1A6"
+  muted: "#9A9AA0"
+  primary: "#EDEDED"
+  on-primary: "#171717"
+  mark-stem-a: "#00D2FF"
+  mark-stem-b: "#0077FE"
+  mark-stem-c: "#0044B8"
+  mark-bowl-a: "#5DFBFF"
+  mark-bowl-b: "#00E5FF"
+  mark-bowl-c: "#0094D4"
+  mark-leg-a: "#E879F9"
+  mark-leg-b: "#A855F7"
+  mark-leg-c: "#6B21A8"
+typography:
+  h1:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 2.25rem
+    fontWeight: 500
+    lineHeight: 1.1
+    letterSpacing: "-0.02em"
+  h2:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 1.75rem
+    fontWeight: 500
+    lineHeight: 1.2
+  body-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 1rem
+    fontWeight: 400
+    lineHeight: 1.5
+  label:
+    fontFamily: JetBrains Mono
+    fontSize: 0.75rem
+    fontWeight: 400
+    lineHeight: 1.3
+rounded:
+  sm: 8px
+  md: 12px
+  lg: 16px
+spacing:
+  sm: 8px
+  md: 16px
+  lg: 24px
+  xl: 32px
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.on-primary}"
+    rounded: "{rounded.sm}"
+    padding: 12px
+    height: 48px
+  button-primary-hover:
+    backgroundColor: "#FFFFFF"
+    textColor: "{colors.on-primary}"
+  button-primary-pressed:
+    backgroundColor: "{colors.secondary}"
+    textColor: "{colors.on-primary}"
+  button-secondary:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.sm}"
+    padding: 12px
+    height: 48px
+  button-disabled:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.muted}"
+    rounded: "{rounded.sm}"
+    padding: 12px
+    height: 48px
+  nav-link:
+    backgroundColor: "{colors.bg}"
+    textColor: "{colors.secondary}"
+  nav-link-current:
+    backgroundColor: "{colors.bg}"
+    textColor: "{colors.text}"
+  nav-hair:
+    backgroundColor: "{colors.hair}"
+  card-rest:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.md}"
+  card-hover:
+    backgroundColor: "{colors.raised}"
+    textColor: "{colors.text}"
+    rounded: "{rounded.md}"
+  chip-stack:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.muted}"
+    rounded: "{rounded.sm}"
+  badge-web:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.muted}"
+  badge-rilis:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.muted}"
+---
+
+## Overview
+
+RaxeHub = etalase pribadi. Bukan toko. Arah **Graphite Shelf** v1.1. Dark only.
+
+IA: **Home** `/` pintu, **APK** `/apk` rak, **Web** `/web` galeri, **Keluar**. Tanpa kata "My". Tanpa "Library" di nav.
+
+Katalog APK: KROMA, Tabungku, GPS Tracker. Semua Rilis. Tidak ada AVS. Tidak ada coming soon.
+
+Katalog Web seed (PRD section 9, live 2026-11-22): Tahun Baru Countdown, Crypto Blog. Badge **WEB**. Tombol **Buka live** (`live_url`, tab baru) + **Source** (`repo_url`). Source disabled jika repo kosong.
+
+Mark: `design/assets/raxe-authentic-v2-nocore.svg`. Cyan/purple hidup di mark. Chrome UI graphite. Dilarang `#22D3EE` / `#A78BFA` di tombol, kartu, glow.
+
+Native: `design/RaxeHub-v2-Concepts.figcraft`. Preview: `design/HOME-360.png`, `design/HOME-1080.png`, `design/WEB-360.png`, `design/WEB-1080.png`, `design/A-360.png`, `design/A-1080.png`, `design/MOTION.png`.
+
+Forge integrasi aset. Artisan tidak sentuh `functions/`, `pages/`, `src/`.
+
+`:root { color-scheme: dark; }` plus `<meta name="color-scheme" content="dark">`.
+
+## Colors
+
+- **bg `#141415`:** kanvas.
+- **card `#19191B`:** rest.
+- **raised `#232325`:** hover / featured / press.
+- **hair `#2A2A2C`:** garis 1px. Nav hairline opacity 0 to 1 setelah scroll 48px.
+- **text `#EDEDED`:** body. 15.73:1 vs bg, AAA.
+- **secondary `#A1A1A6`:** nav idle, tagline. 7.16:1 vs bg, AAA.
+- **muted `#9A9AA0`:** meta, chip, footer, Source disabled. 6.27:1 vs card, AA.
+- **primary `#EDEDED`:** tombol utama. **on-primary `#171717`:** 15.31:1, AAA.
+- Mark grads: stem `#00D2FF` `#0077FE` `#0044B8`, bowl `#5DFBFF` `#00E5FF` `#0094D4`, leg `#E879F9` `#A855F7` `#6B21A8`. Hanya di SVG mark.
+
+## Typography
+
+Plus Jakarta Sans display/body. JetBrains Mono meta, chip, badge, countdown thumb.
+
+Skala 8px. Body 16/24. H1 Home 32-40. Label 12. Chip 11.
+
+## Layout
+
+Grid 8px. Page pad 16 mobile, 32 desktop. Nav 56. Tap 48.
+
+Break: 360 (A21s), 1080 (laptop).
+
+**360 nav:** empat tab sama lebar (Home, APK, Web, Keluar). Wordmark tidak di nav — hidup di hero. Hit 48x56.
+
+**1080 nav:** wordmark RaxeHub + Home + APK + Web + Keluar. Current = text + underline 2px.
+
+Home `/`: hero full-viewport (mark + wordmark + tagline workshop + CTA **Masuk library** ke `/apk`) lalu scroll-reveal 3 tile rilis. Deskripsi 2 baris per kartu (F10).
+
+APK `/apk`: featured KROMA lifted + Tabungku + GPS. CTA Buka detail / Unduh APK. Deskripsi 2 baris.
+
+Web `/web`: grid kartu thumbnail + nama + tagline + stack chip + deskripsi 2 baris + Buka live + Source. Badge WEB.
+
+Detail `/app/{slug}`: Forge. View Transition share icon.
+
+## Elevation & Depth
+
+Gelap = step permukaan + hairline + inset `0 1px 0 rgba(255,255,255,0.12)`. Bukan drop-shadow glow.
+
+Rest = card. Hover = raised + naik 4-8px, 160ms. Press = scale 0.97-0.98, 120ms. Easing `cubic-bezier(0.22, 1, 0.36, 1)`.
+
+Hanya color, background, border, opacity, transform. Dilarang `transition: all`.
+
+## Motion (F11)
+
+- **Mark enter (Home, once):** opacity 0 to 1, translateY(12px to 0), 640ms, `forwards`. No loop. No glow pulse.
+- **Tile reveal:** opacity + translateY 8px, 480ms, stagger 80ms, scroll-driven.
+- **Nav hairline:** opacity 0 di hero top, 1 setelah 48px scroll.
+- **CTA / card:** hover 160ms rise, press 120ms scale 0.97.
+- **View Transition:** icon share-element ke `/app/{slug}`.
+- **`prefers-reduced-motion`:** color / opacity only. Skip translate dan scale.
+
+## Shapes
+
+Keycap/tombol 8. Kartu 12. Featured 16. Chip 6. Nested inner = outer - pad, min 4. Focus ring 2px text, offset 3. Dilarang `outline: none` tanpa ring.
+
+## Components
+
+**Nav.** 56. 360: 4 tab equal. 1080: wordmark + 3 tab + Keluar. Current underline 2px. Idle secondary. Keluar selalu secondary.
+
+**Home.** Hero full-viewport mark autentik. CTA Masuk library ke `/apk`. Tiga tile rilis di bawah fold.
+
+**APK.** Featured KROMA raised. Tabungku + GPS compact. Semua Rilis.
+
+**Web.** Thumbnail graphite (bukan screenshot palsu). Chip stack muted. Buka live primary. Source secondary; disabled + muted jika `repo_url` kosong. Jangan invent repo.
+
+**Button primary.** Off-white, ink text, tinggi 48, highlight atas 18%.
+
+**Button secondary.** raised + hairline.
+
+**Button disabled.** card + hair + muted.
+
+**Card.** Rest card, hover raised. Isi: icon/thumb, nama, tagline, deskripsi 2-3 baris truncated, badge.
+
+**Chip.** card + hair, JetBrains 11, muted.
+
+**Badge.** Rilis atau WEB. Muted mono. Bukan cyan.
+
+**Footer APK.** Sideload 2 baris di 360.
+
+**Footer Web.** Live tab baru. Source hanya jika repo ada.
+
+**Mark.** Path autentik. Jangan gambar ulang.
+
+## Copy kartu (F10)
+
+APK:
+
+- KROMA — Player musik pribadi. Putar berkas lokal di HP. Antrian, sleep timer, tanpa akun.
+- Tabungku — Tabungan berdasar tujuan. Satu tujuan, satu tabungan. Catat setoran, lihat sisa target.
+- GPS Tracker — Pelacak lokasi. Lacak posisi HP. Riwayat rute, tanpa toko.
+
+Web:
+
+- Tahun Baru Countdown — Callsign Radio. Hitung mundur tahun baru. Angka live Firebase, bukan palsu. Stack Next.js, Firebase. live `https://tahun-baru-countdown-eosin.vercel.app/`
+- Crypto Blog — Catatan beranda. Tulisan crypto di Vercel. Next 16. Bukan sinyal trading. Stack Next.js 16, Vercel. live `https://crypto-blog-ten.vercel.app/beranda`
+
+## Do's and Don'ts
+
+Do: graphite chrome, mark berwarna, 3 APK rilis, 2 web seed, Home / APK / Web, elevasi step, Source disabled tanpa repo.
+
+Don't: kata My, Library di nav, cyan/purple chrome, glow, AVS, coming soon, `transition: all`, bounce, loop mark, light mode, invent repo_url, sentuh `functions/` `pages/` `src/`.

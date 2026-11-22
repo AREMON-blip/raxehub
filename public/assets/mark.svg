@@ -1,0 +1,95 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Background Radial Gradient -->
+    <radialGradient id="cyberBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0c1626"/>
+      <stop offset="55%" stop-color="#070c14"/>
+      <stop offset="100%" stop-color="#030508"/>
+    </radialGradient>
+
+    <!-- Subtle Radial Glow behind R -->
+    <radialGradient id="centerCyanGlow" cx="50%" cy="48%" r="35%">
+      <stop offset="0%" stop-color="#00E5FF" stop-opacity="0.16"/>
+      <stop offset="60%" stop-color="#0066FF" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Stem Gradient (Cobalt / Deep Azure to Bright Blue) -->
+    <linearGradient id="stemGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF"/>
+      <stop offset="35%" stop-color="#0077FE"/>
+      <stop offset="100%" stop-color="#0044B8"/>
+    </linearGradient>
+
+    <!-- Bowl Gradient (Vibrant Cyan / Aqua) -->
+    <linearGradient id="bowlGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5DFBFF"/>
+      <stop offset="40%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#0094D4"/>
+    </linearGradient>
+
+    <!-- Leg Gradient (Deep Violet / Neon Purple) -->
+    <linearGradient id="legGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E879F9"/>
+      <stop offset="30%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#6B21A8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Background -->
+  <rect width="512" height="512" fill="url(#cyberBg)"/>
+  <rect width="512" height="512" fill="url(#centerCyanGlow)"/>
+
+  <!-- 2. Pure White Enclosure Ring -->
+  <circle cx="256" cy="256" r="212" stroke="#FFFFFF" stroke-width="2.2" stroke-opacity="0.95"/>
+  <circle cx="256" cy="256" r="218" stroke="#00E5FF" stroke-width="1" stroke-opacity="0.25"/>
+
+  <!-- 3. STEM (Left Pillar with 45-deg cuts) -->
+  <!-- Box: X 146 -> 194. Y 132 -> 380 -->
+  <g id="stem">
+    <!-- Main Body -->
+    <path d="M194 132 V332 L146 380 V180 L194 132 Z" fill="url(#stemGrad)"/>
+    
+    <!-- Top-Left Specular White Bevel -->
+    <polygon points="194,132 188,132 146,174 146,180 150,180 194,136" fill="#FFFFFF" opacity="0.95"/>
+    <line x1="146" y1="180" x2="146" y2="380" stroke="#70B8FF" stroke-width="1.8" stroke-opacity="0.6"/>
+    
+    <!-- Bottom Slanted Accent Edge -->
+    <line x1="146" y1="380" x2="194" y2="332" stroke="#93C5FD" stroke-width="2.5" stroke-opacity="0.9"/>
+  </g>
+
+  <!-- 4. BOWL (Top Loop with Octagonal Chamfers) -->
+  <!-- Gap = 16px. X starts at 210. -->
+  <g id="bowl">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="
+      M210 132 H318 L360 174 V204 L318 246 H210 V132 Z
+      M210 170 H298 L320 192 L298 214 H210 V170 Z
+    " fill="url(#bowlGrad)"/>
+
+    <!-- Top & Top-Right Chamfer Specular White Bevel Strip -->
+    <path d="M210 132 H318 L360 174 L357 177 L316 136 H210 V132 Z" fill="#FFFFFF" opacity="0.95"/>
+    
+    <!-- Inner Counter Specular Rim Highlight -->
+    <path d="M210 170 H298 L320 192 L317 194 L296 173 H210 V170 Z" fill="#E6FFFF" opacity="0.85"/>
+    
+    <!-- Bottom Chamfer Shadow Line -->
+    <line x1="360" y1="204" x2="318" y2="246" stroke="#004D73" stroke-width="2.5" stroke-opacity="0.8"/>
+  </g>
+
+  <!-- (DIAMOND CORE REMOVED COMPLETELY - CLEAN STENCIL CHANNELS) -->
+
+  <!-- 5. LEG (Purple Diagonal Strut, 45-deg Angle) -->
+  <!-- Top-left: (210, 254), Top-right: (262, 254), Bottom-right: (356, 348), Bottom-left: (330, 374) -->
+  <g id="leg">
+    <!-- Main Leg Body -->
+    <polygon points="210,254 262,254 356,348 330,374" fill="url(#legGrad)"/>
+
+    <!-- Bright Cyan Accent on Lower-Right Edge -->
+    <line x1="262" y1="254" x2="356" y2="348" stroke="#00FFFF" stroke-width="2.5" stroke-opacity="0.95"/>
+    <line x1="330" y1="374" x2="356" y2="348" stroke="#00E5FF" stroke-width="2.5" stroke-opacity="0.9"/>
+
+    <!-- Top-Left Edge Specular White Highlight -->
+    <line x1="210" y1="254" x2="262" y2="254" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.9"/>
+    <line x1="210" y1="254" x2="330" y2="374" stroke="#F5D0FE" stroke-width="1.8" stroke-opacity="0.8"/>
+  </g>
+</svg>

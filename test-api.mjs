@@ -1,0 +1,168 @@
+import assert from 'node:assert/strict'
+
+const BASE = process.env.BASE ?? 'http://127.0.0.1:8807'
+const ADMIN = { authorization: 'Bearer test:admin@raxehub.test' }
+const CIRCLE = { authorization: 'Bearer test:circle@raxehub.test' }
+const OUTSIDER = { authorization: 'Bearer test:outsider@example.test' }
+const SHA = 'b'.repeat(64)
+
+async function req(path, { method = 'GET', headers = {}, body } = {}) {
+  const response = await fetch(`${BASE}${path}`, {
+    method,
+    headers: {
+      ...headers,
+      ...(body === undefined ? {} : { 'content-type': 'application/json' }),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+    redirect: 'manual',
+  })
+  const raw = await response.text()
+  let data = null
+  try {
+    data = JSON.parse(raw)
+  } catch {
+    // non-JSON response (302 has empty body)
+  }
+  return { status: response.status, headers: response.headers, data, raw }
+}
+
+function expect(result, status, code) {
+  assert.equal(result.status, status, `${status} expected, got ${result.status}: ${result.raw}`)
+  if (code) assert.equal(result.data?.code, code, `expected ${code}: ${result.raw}`)
+}
+
+let ready = false
+for (let attempt = 0; attempt < 80; attempt += 1) {
+  try {
+    if ((await req('/api/health')).status === 200) {
+      ready = true
+      break
+    }
+  } catch {
+    // dev server still booting
+  }
+  await new Promise((resolve) => setTimeout(resolve, 250))
+}
+assert.ok(ready, 'wrangler pages dev did not become ready')
+
+const health = await req('/api/health')
+expect(health, 200)
+assert.deepEqual(
+  { status: health.data.status, neon: health.data.neon, r2: health.data.r2, clerk: health.data.clerk },
+  { status: 'ok', neon: 'ok', r2: 'ok', clerk: 'local' },
+)
+
+const apps = await req('/api/apps')
+expect(apps, 200)
+assert.ok(Array.isArray(apps.data.apps) && apps.data.apps.length >= 2)
+assert.equal(apps.data.apps[0].slug, 'gps-tracker')
+assert.equal(apps.data.apps[0].latestVersion.versionCode, 201)
+
+const detail = await req('/api/apps/gps-tracker')
+expect(detail, 200)
+assert.equal(detail.data.app.slug, 'gps-tracker')
+assert.equal(detail.data.versions.length, 1)
+assert.equal(detail.data.screenshots.length, 1)
+assert.equal(detail.data.versions[0].sha256.length, 64)
+expect(await req('/api/apps/does-not-exist'), 404, 'E-NOTFOUND')
+
+const download = await req('/api/download/gps-tracker')
+expect(download, 302)
+const location = new URL(download.headers.get('location'))
+assert.match(location.host, /\.r2\.cloudflarestorage\.com$/)
+assert.doesNotMatch(location.host, /r2\.dev/)
+assert.match(location.searchParams.get('response-content-disposition') ?? '', /^attachment; filename=/)
+assert.match(location.pathname, /\/apps\/gps-tracker\/gpstracker-2\.0\.1\.apk$/)
+assert.equal(location.searchParams.get('X-Amz-Expires'), '900')
+assert.match(location.searchParams.get('response-content-disposition') ?? '', /^attachment; filename=/)
+
+const versionDownload = await req('/api/download/gps-tracker/22222222-2222-4222-8222-222222222222')
+expect(versionDownload, 302)
+assert.equal(
+  new URL(versionDownload.headers.get('location')).searchParams.get('X-Amz-Expires'),
+  '900',
+)
+expect(await req('/api/download/does-not-exist'), 404, 'E-NOTFOUND')
+
+expect(await req('/api/admin/presign-upload', { method: 'POST', body: {} }), 401, 'E-AUTH')
+expect(
+  await req('/api/admin/presign-upload', { headers: OUTSIDER, method: 'POST', body: {} }),
+  403,
+  'E-AUTH',
+)
+expect(
+  await req('/api/admin/presign-upload', { headers: CIRCLE, method: 'POST', body: {} }),
+  403,
+  'E-AUTH',
+)
+
+const presign = await req('/api/admin/presign-upload', {
+  headers: ADMIN,
+  method: 'POST',
+  body: {
+    fileName: 'gpstracker-2.0.1.apk',
+    sizeBytes: 12_345_678,
+    sha256: SHA,
+    slug: 'gps-tracker',
+    versionName: '2.0.1',
+  },
+})
+expect(presign, 200)
+assert.match(presign.data.key, /^apps\/gps-tracker\//)
+assert.equal(presign.data.method, 'PUT')
+assert.equal(presign.data.expiresIn, 900)
+assert.equal(new URL(presign.data.uploadUrl).searchParams.get('X-Amz-Expires'), '900')
+
+expect(
+  await req('/api/admin/presign-upload', {
+    headers: ADMIN,
+    method: 'POST',
+    body: { fileName: 'bad.apk', sizeBytes: 10, sha256: 'not-a-hash' },
+  }),
+  400,
+  'E-BODY',
+)
+
+const createdApp = await req('/api/admin/apps', {
+  headers: ADMIN,
+  method: 'POST',
+  body: { slug: 'new-app', name: 'New App', tagline: 'fresh', status: 'released', sort: 2 },
+})
+expect(createdApp, 201)
+assert.equal(createdApp.data.app.slug, 'new-app')
+
+const createdVersion = await req('/api/admin/versions', {
+  headers: ADMIN,
+  method: 'POST',
+  body: {
+    appId: createdApp.data.app.id,
+    versionName: '1.0.0',
+    versionCode: 100,
+    releaseNotes: 'first',
+    apkKey: 'apps/new-app/new-app-1.0.0.apk',
+    sizeBytes: 1000,
+    sha256: SHA,
+  },
+})
+expect(createdVersion, 201)
+assert.equal(createdVersion.data.version.active, true)
+
+const screenshot = await req(`/api/admin/upload-screenshot/${createdApp.data.app.id}`, {
+  headers: ADMIN,
+  method: 'POST',
+  body: { fileName: 'home.png', caption: 'Beranda', sort: 0 },
+})
+expect(screenshot, 200)
+assert.match(screenshot.data.key, /screenshots\/home\.png$/)
+assert.equal(screenshot.data.expiresIn, 900)
+
+const patched = await req(`/api/admin/apps/${createdApp.data.app.id}`, {
+  headers: ADMIN,
+  method: 'PATCH',
+  body: { status: 'coming-soon' },
+})
+expect(patched, 200)
+assert.equal(patched.data.app.status, 'coming-soon')
+
+expect(await req('/api/health'), 200)
+console.log('test-api: PASS (all routes)')

@@ -1,0 +1,19 @@
+{
+  "name": "raxehub",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev --port 8788 --ip 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "test:api": "bash test-api.sh"
+  },
+  "dependencies": {
+    "@clerk/backend": "^2.0.0",
+    "@neondatabase/serverless": "^1.0.0",
+    "aws4fetch": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "wrangler": "^4.0.0"
+  }
+}

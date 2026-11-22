@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="720" viewBox="0 0 1080 720"><rect x="0" y="0" width="1080" height="720" rx="0" fill="#141415"/><rect x="0" y="0" width="1080" height="720" rx="0" fill="#141415"/><text x="32" y="40" text-anchor="start" font-family="Plus Jakarta Sans" font-size="22" font-weight="500" fill="#EDEDED">Motion v1.2 FULL CREATIVE</text><text x="32" y="66" text-anchor="start" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#9A9AA0">Lenis lerp 0.1 + GSAP ScrollTrigger. Graphite. No glow. Reduce = color only.</text><rect x="32" y="88" width="320" height="248" rx="12" fill="#232325" stroke="#2A2A2C" stroke-width="1"/><line x1="36.8" y1="89" x2="347.2" y2="89" stroke="#FFFFFF" stroke-width="1" opacity="0.12"/><text x="52" y="124" text-anchor="start" font-family="Plus Jakarta Sans" font-size="16" font-weight="500" fill="#EDEDED">Mark 900ms</text><text x="52" y="152" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#A1A1A6">Y24 + rotateX 8</text><text x="52" y="176" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#9A9AA0">once, stagger 80</text><g id="m0-mark" transform="translate(144,200) scale(0.187500)">
+  <defs>
+    <radialGradient id="m0-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0c1626"/>
+      <stop offset="55%" stop-color="#070c14"/>
+      <stop offset="100%" stop-color="#030508"/>
+    </radialGradient>
+    <linearGradient id="m0-stem" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF"/>
+      <stop offset="35%" stop-color="#0077FE"/>
+      <stop offset="100%" stop-color="#0044B8"/>
+    </linearGradient>
+    <linearGradient id="m0-bowl" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5DFBFF"/>
+      <stop offset="40%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#0094D4"/>
+    </linearGradient>
+    <linearGradient id="m0-leg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E879F9"/>
+      <stop offset="30%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#6B21A8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#m0-bg)"/>
+  <circle cx="256" cy="256" r="212" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-opacity="0.95"/>
+  <path d="M194 132 V332 L146 380 V180 L194 132 Z" fill="url(#m0-stem)"/>
+  <polygon points="194,132 188,132 146,174 146,180 150,180 194,136" fill="#FFFFFF" opacity="0.95"/>
+  <line x1="146" y1="180" x2="146" y2="380" stroke="#70B8FF" stroke-width="1.8" stroke-opacity="0.6"/>
+  <line x1="146" y1="380" x2="194" y2="332" stroke="#93C5FD" stroke-width="2.5" stroke-opacity="0.9"/>
+  <path fill-rule="evenodd" d="M210 132 H318 L360 174 V204 L318 246 H210 V132 Z M210 170 H298 L320 192 L298 214 H210 V170 Z" fill="url(#m0-bowl)"/>
+  <path d="M210 132 H318 L360 174 L357 177 L316 136 H210 V132 Z" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M210 170 H298 L320 192 L317 194 L296 173 H210 V170 Z" fill="#E6FFFF" opacity="0.85"/>
+  <line x1="360" y1="204" x2="318" y2="246" stroke="#004D73" stroke-width="2.5" stroke-opacity="0.8"/>
+  <polygon points="210,254 262,254 356,348 330,374" fill="url(#m0-leg)"/>
+  <line x1="262" y1="254" x2="356" y2="348" stroke="#00FFFF" stroke-width="2.5" stroke-opacity="0.95"/>
+  <line x1="330" y1="374" x2="356" y2="348" stroke="#00E5FF" stroke-width="2.5" stroke-opacity="0.9"/>
+  <line x1="210" y1="254" x2="262" y2="254" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.9"/>
+  <line x1="210" y1="254" x2="330" y2="374" stroke="#F5D0FE" stroke-width="1.8" stroke-opacity="0.8"/>
+</g><rect x="380" y="88" width="320" height="248" rx="12" fill="#19191B" stroke="#2A2A2C" stroke-width="1"/><text x="400" y="124" text-anchor="start" font-family="Plus Jakarta Sans" font-size="16" font-weight="500" fill="#EDEDED">Parallax</text><text x="400" y="152" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#A1A1A6">mark y% 12</text><text x="400" y="176" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#9A9AA0">plate y% 20 scrub</text><rect x="400" y="208" width="280" height="96" rx="8" fill="#232325" stroke="#2A2A2C" stroke-width="1"/><text x="540" y="264" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#A1A1A6">Parallax</text><rect x="728" y="88" width="320" height="248" rx="12" fill="#19191B" stroke="#2A2A2C" stroke-width="1"/><text x="748" y="124" text-anchor="start" font-family="Plus Jakarta Sans" font-size="16" font-weight="500" fill="#EDEDED">Reveal</text><text x="748" y="152" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#A1A1A6">Y32 stagger 100</text><text x="748" y="176" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#9A9AA0">start top 85%</text><rect x="748" y="208" width="280" height="96" rx="8" fill="#232325" stroke="#2A2A2C" stroke-width="1"/><text x="888" y="264" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#A1A1A6">Reveal</text><rect x="32" y="360" width="320" height="248" rx="12" fill="#19191B" stroke="#2A2A2C" stroke-width="1"/><text x="52" y="396" text-anchor="start" font-family="Plus Jakarta Sans" font-size="16" font-weight="500" fill="#EDEDED">Magnetic</text><text x="52" y="424" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#A1A1A6">CTA + tile 8px</text><text x="52" y="448" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#9A9AA0">pointer only</text><rect x="52" y="480" width="280" height="96" rx="8" fill="#232325" stroke="#2A2A2C" stroke-width="1"/><text x="192" y="536" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#A1A1A6">Magnetic</text><rect x="380" y="360" width="320" height="248" rx="12" fill="#19191B" stroke="#2A2A2C" stroke-width="1"/><text x="400" y="396" text-anchor="start" font-family="Plus Jakarta Sans" font-size="16" font-weight="500" fill="#EDEDED">Tilt 6deg</text><text x="400" y="424" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#A1A1A6">persp 800</text><text x="400" y="448" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#9A9AA0">pointer only</text><rect x="400" y="480" width="280" height="96" rx="8" fill="#232325" stroke="#2A2A2C" stroke-width="1"/><text x="540" y="536" text-anchor="middle" font-family="Plus Jakarta Sans" font-size="13" font-weight="400" fill="#A1A1A6">Tilt 6deg</text><rect x="728" y="360" width="320" height="248" rx="12" fill="#19191B" stroke="#2A2A2C" stroke-width="1"/><text x="748" y="396" text-anchor="start" font-family="Plus Jakarta Sans" font-size="16" font-weight="500" fill="#EDEDED">Reduced</text><text x="748" y="424" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#A1A1A6">opacity only</text><text x="748" y="448" text-anchor="start" font-family="JetBrains Mono" font-size="13" font-weight="400" fill="#9A9AA0">Lenis respect RM</text><g id="m5-mark" transform="translate(840,472) scale(0.187500)">
+  <defs>
+    <radialGradient id="m5-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0c1626"/>
+      <stop offset="55%" stop-color="#070c14"/>
+      <stop offset="100%" stop-color="#030508"/>
+    </radialGradient>
+    <linearGradient id="m5-stem" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF"/>
+      <stop offset="35%" stop-color="#0077FE"/>
+      <stop offset="100%" stop-color="#0044B8"/>
+    </linearGradient>
+    <linearGradient id="m5-bowl" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5DFBFF"/>
+      <stop offset="40%" stop-color="#00E5FF"/>
+      <stop offset="100%" stop-color="#0094D4"/>
+    </linearGradient>
+    <linearGradient id="m5-leg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E879F9"/>
+      <stop offset="30%" stop-color="#A855F7"/>
+      <stop offset="100%" stop-color="#6B21A8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#m5-bg)"/>
+  <circle cx="256" cy="256" r="212" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-opacity="0.95"/>
+  <path d="M194 132 V332 L146 380 V180 L194 132 Z" fill="url(#m5-stem)"/>
+  <polygon points="194,132 188,132 146,174 146,180 150,180 194,136" fill="#FFFFFF" opacity="0.95"/>
+  <line x1="146" y1="180" x2="146" y2="380" stroke="#70B8FF" stroke-width="1.8" stroke-opacity="0.6"/>
+  <line x1="146" y1="380" x2="194" y2="332" stroke="#93C5FD" stroke-width="2.5" stroke-opacity="0.9"/>
+  <path fill-rule="evenodd" d="M210 132 H318 L360 174 V204 L318 246 H210 V132 Z M210 170 H298 L320 192 L298 214 H210 V170 Z" fill="url(#m5-bowl)"/>
+  <path d="M210 132 H318 L360 174 L357 177 L316 136 H210 V132 Z" fill="#FFFFFF" opacity="0.95"/>
+  <path d="M210 170 H298 L320 192 L317 194 L296 173 H210 V170 Z" fill="#E6FFFF" opacity="0.85"/>
+  <line x1="360" y1="204" x2="318" y2="246" stroke="#004D73" stroke-width="2.5" stroke-opacity="0.8"/>
+  <polygon points="210,254 262,254 356,348 330,374" fill="url(#m5-leg)"/>
+  <line x1="262" y1="254" x2="356" y2="348" stroke="#00FFFF" stroke-width="2.5" stroke-opacity="0.95"/>
+  <line x1="330" y1="374" x2="356" y2="348" stroke="#00E5FF" stroke-width="2.5" stroke-opacity="0.9"/>
+  <line x1="210" y1="254" x2="262" y2="254" stroke="#FFFFFF" stroke-width="2" stroke-opacity="0.9"/>
+  <line x1="210" y1="254" x2="330" y2="374" stroke="#F5D0FE" stroke-width="1.8" stroke-opacity="0.8"/>
+</g><rect x="744" y="468" width="288" height="120" rx="8" fill="#141415" opacity="0.45"/><text x="888" y="536" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="400" fill="#9A9AA0">no transform</text><text x="32" y="640" text-anchor="start" font-family="Plus Jakarta Sans" font-size="12" font-weight="400" fill="#9A9AA0">Hairline 0-48px. Hover 160ms rise. Press 0.97. cubic-bezier(0.22, 1, 0.36, 1).</text><text x="32" y="664" text-anchor="start" font-family="Plus Jakarta Sans" font-size="12" font-weight="400" fill="#9A9AA0">No loop mark. No glow. Magnetic/tilt off on touch. respectReducedMotion true.</text><text x="32" y="688" text-anchor="start" font-family="Plus Jakarta Sans" font-size="12" font-weight="400" fill="#9A9AA0">View Transition: icon share-element. Tentang copy: Raxe Workshop generic.</text></svg>

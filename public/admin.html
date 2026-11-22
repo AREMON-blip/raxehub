@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="Halaman pengelola RaxeHub untuk merilis APK. Hanya untuk akun admin.">
+  <title>Admin — RaxeHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/styles.css">
+  <script src="/assets/config.js"></script>
+</head>
+<body data-page="admin">
+  <div id="nav-mount"></div>
+  <main id="main">
+    <section class="section wrap">
+      <span class="label">ADMIN / UNGGAH</span>
+      <h1 class="h1" style="margin-top:12px">Rilis APK</h1>
+      <p class="lead" style="margin-top:16px">SHA256 dihitung di browser. Berkas dikirim langsung ke R2, maksimal 80 MB.</p>
+
+      <form id="admin-form" class="card" style="margin-top:32px;display:grid;gap:24px">
+        <div class="form-grid">
+          <div class="field"><label class="label" for="f-slug">Slug</label><input id="f-slug" name="slug" required placeholder="gps-tracker"></div>
+          <div class="field"><label class="label" for="f-name">Nama</label><input id="f-name" name="name" required placeholder="GPS Tracker"></div>
+          <div class="field"><label class="label" for="f-tagline">Tagline</label><input id="f-tagline" name="tagline" placeholder="Pelacak lokasi."></div>
+          <div class="field"><label class="label" for="f-status">Status</label>
+            <select id="f-status" name="status"><option value="released">released</option><option value="coming-soon">coming-soon</option></select>
+          </div>
+          <div class="field" style="grid-column:1/-1"><label class="label" for="f-desc">Deskripsi</label><textarea id="f-desc" name="description" placeholder="Deskripsi 2–3 baris"></textarea></div>
+          <div class="field"><label class="label" for="f-version">Nama versi</label><input id="f-version" name="versionName" required placeholder="2.0.1"></div>
+          <div class="field"><label class="label" for="f-code">Kode versi</label><input id="f-code" name="versionCode" type="number" min="1" required placeholder="201"></div>
+          <div class="field" style="grid-column:1/-1"><label class="label" for="f-notes">Catatan rilis</label><textarea id="f-notes" name="releaseNotes" placeholder="Perubahan pada versi ini"></textarea></div>
+          <div class="field"><label class="label" for="f-sort">Urutan</label><input id="f-sort" name="sort" type="number" value="0"></div>
+          <div class="field"><label class="label" for="f-apk">Berkas APK (maks. 80 MB)</label><input id="f-apk" name="apk" type="file" accept=".apk" required></div>
+        </div>
+
+        <div class="stack">
+          <div class="label">PROGRES SHA256</div><div class="progress"><i id="hash-bar"></i></div>
+          <div class="label">PROGRES UNGGAH</div><div class="progress"><i id="upload-bar"></i></div>
+          <p class="status-line" data-status aria-live="polite"></p>
+          <div id="admin-result"></div>
+        </div>
+        <div><button class="btn btn-primary" type="submit">Unggah rilis</button></div>
+      </form>
+    </section>
+  </main>
+  <div id="footer-mount"></div>
+  <script type="module" src="/assets/admin.js"></script>
+</body>
+</html>
