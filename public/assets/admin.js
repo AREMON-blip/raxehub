@@ -1,4 +1,4 @@
-import { ApiFailure, api, esc, ensureIdentity, listApps, renderChrome } from './shared.js'
+import { ApiFailure, api, esc, ensureIdentity, listApps, renderChrome, signOut } from './shared.js'
 import { sha256File } from './sha256.js'
 
 const MAX_UPLOAD_BYTES = 80 * 1024 * 1024
@@ -110,7 +110,7 @@ const gate = document.getElementById('admin-gate')
 const content = document.getElementById('admin-content')
 
 try {
-  const identity = await ensureIdentity()
+  const identity = await ensureIdentity(gate)
   if (identity) {
     await api('/api/admin/me', { identity })
     gate.hidden = true
@@ -120,5 +120,12 @@ try {
 } catch (error) {
   gate.innerHTML = `<div class="card"><h1 class="h2">Akses admin ditolak</h1>
     <p class="lead" style="margin-top:12px">${esc(error.message || 'Verifikasi akun gagal.')}</p>
-    <a class="btn btn-secondary" href="/" style="margin-top:20px">Kembali ke beranda</a></div>`
+    <div class="btn-row" style="margin-top:20px">
+      <button class="btn btn-primary" id="admin-relogin" type="button">Ganti akun</button>
+      <a class="btn btn-secondary" href="/">Kembali ke beranda</a>
+    </div></div>`
+  document.getElementById('admin-relogin')?.addEventListener('click', async () => {
+    await signOut()
+    location.reload()
+  })
 }

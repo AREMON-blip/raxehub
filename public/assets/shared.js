@@ -78,7 +78,7 @@ function loadClerk() {
   return clerkLoad
 }
 
-export async function ensureIdentity() {
+export async function ensureIdentity(mountEl = null) {
   if (!PK && !isLocalHost()) {
     fatal('Publishable key Clerk belum dikonfigurasi. Hubungi admin.')
     return null
@@ -86,7 +86,15 @@ export async function ensureIdentity() {
   if (PK) {
     const clerk = await loadClerk()
     if (!clerk.user) {
-      await clerk.redirectToSignIn()
+      if (mountEl) {
+        mountEl.innerHTML = '<div id="clerk-signin" style="display:flex;justify-content:center;padding-block:24px"></div>'
+        clerk.mountSignIn(mountEl.querySelector('#clerk-signin'), {
+          forceRedirectUrl: '/admin',
+          fallbackRedirectUrl: '/admin',
+        })
+      } else {
+        await clerk.redirectToSignIn({ redirectUrl: location.href })
+      }
       return null
     }
     return { email: clerk.user.primaryEmailAddress?.emailAddress || '', dev: false }
