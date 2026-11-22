@@ -8,9 +8,19 @@ CREATE TABLE IF NOT EXISTS apps (
   tagline text,
   description text,
   status text NOT NULL DEFAULT 'released',
+  type text NOT NULL DEFAULT 'apk',
+  live_url text,
+  repo_url text,
+  stack text,
   sort int NOT NULL DEFAULT 0,
   created_at timestamptz DEFAULT now()
 );
+
+-- Existing databases: add PRD §5 / F9 columns without touching stored rows.
+ALTER TABLE apps ADD COLUMN IF NOT EXISTS type text NOT NULL DEFAULT 'apk';
+ALTER TABLE apps ADD COLUMN IF NOT EXISTS live_url text;
+ALTER TABLE apps ADD COLUMN IF NOT EXISTS repo_url text;
+ALTER TABLE apps ADD COLUMN IF NOT EXISTS stack text;
 
 CREATE TABLE IF NOT EXISTS versions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

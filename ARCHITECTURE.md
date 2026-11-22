@@ -78,7 +78,7 @@ Semua route di-prefix `/api`. Response JSON, error format `{error, code}`.
 | `/app/:slug` | Detail app (apk atau web — web: live/source, tanpa changelog/APK) |
 | `/admin` | Upload + metadata (termasuk type, live_url, repo_url, stack) |
 
-Nav: Home | APK | Web | Keluar. Dark-only, animasi native (F11).
+Nav public: Home | APK | Web (3 tab). Nav "Keluar" HANYA muncul pas session admin (Zero login surface, PRD F1 AMEND). CTA hero "Buka karya". Dark-only, animasi native (F11).
 
 **PIVOT PUBLIC (2026-11-23):** route publik (/, /apk, /web, /app/:slug, /api/apps,
 /api/download) = anonymous, no auth. Clerk middleware **hanya guard `/admin` +

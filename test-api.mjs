@@ -45,6 +45,17 @@ for (let attempt = 0; attempt < 80; attempt += 1) {
 }
 assert.ok(ready, 'wrangler pages dev did not become ready')
 
+const config = await req('/config')
+expect(config, 200)
+assert.match(config.headers.get('content-type') ?? '', /application\/javascript/)
+assert.match(config.raw, /^window\.RAXEHUB_CLERK_PUBLISHABLE_KEY = /)
+
+const meAnon = await req('/api/admin/me')
+expect(meAnon, 401, 'E-AUTH')
+const meAdmin = await req('/api/admin/me', { headers: ADMIN })
+expect(meAdmin, 200)
+assert.equal(meAdmin.data.email, 'admin@raxehub.test')
+
 const health = await req('/api/health')
 expect(health, 200)
 assert.deepEqual(
@@ -163,6 +174,16 @@ const patched = await req(`/api/admin/apps/${createdApp.data.app.id}`, {
 })
 expect(patched, 200)
 assert.equal(patched.data.app.status, 'coming-soon')
+
+for (const path of [
+  '/icons/kroma.png', '/icons/tabungku.png', '/icons/gps-tracker.png',
+  '/previews/tahun-baru-countdown-360.png', '/previews/tahun-baru-countdown-1080.png',
+  '/previews/crypto-blog-360.png', '/previews/crypto-blog-1080.png',
+]) {
+  const asset = await req(path)
+  expect(asset, 200)
+  assert.match(asset.headers.get('content-type') ?? '', /image\/png/)
+}
 
 expect(await req('/api/health'), 200)
 console.log('test-api: PASS (all routes)')

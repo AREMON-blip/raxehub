@@ -8,10 +8,33 @@ function versionLabel(app) {
   return app?.latestVersion?.versionName ? `v${app.latestVersion.versionName}` : 'Rilis'
 }
 
+const ICON_SLUGS = new Set(['kroma', 'tabungku', 'gps-tracker'])
+const PREVIEW_SLUGS = new Set(['tahun-baru-countdown', 'crypto-blog'])
+
+function iconHtml(app, large = false) {
+  const cls = `tile-icon${large ? ' detail-icon' : ''}`
+  if (!ICON_SLUGS.has(app.slug)) return `<span class="${cls}">${esc(app.name.slice(0, 2).toUpperCase())}</span>`
+  const size = large ? 96 : 64
+  return `<span class="${cls}" style="width:${size}px;height:${size}px;background:#19191B;border-color:#2A2A2C">
+    <img src="/icons/${encodeURIComponent(app.slug)}.png" alt="${esc(app.name)}" width="${size}" height="${size}"
+      loading="lazy" style="display:block;width:100%;height:100%;object-fit:contain">
+  </span>`
+}
+
+function previewHtml(app) {
+  if (!PREVIEW_SLUGS.has(app.slug)) return `WEB / ${esc(app.name.slice(0, 2).toUpperCase())}`
+  const file = `/previews/${encodeURIComponent(app.slug)}`
+  return `<picture style="display:block;width:100%;height:100%">
+    <source media="(min-width:680px)" srcset="${file}-1080.png">
+    <img src="${file}-360.png" alt="Pratinjau ${esc(app.name)}" loading="lazy"
+      style="display:block;width:100%;height:100%;object-fit:cover">
+  </picture>`
+}
+
 function tileHtml(app, featured = false) {
   const ready = app.latestVersion !== null
   return `<article class="card tile tilt-scene${featured ? ' card-featured' : ''}" data-tilt data-reveal>
-    <div class="tile-top"><span class="tile-icon">${esc(app.name.slice(0, 2).toUpperCase())}</span><span class="badge">RILIS</span></div>
+    <div class="tile-top">${iconHtml(app)}<span class="badge">RILIS</span></div>
     <h3 class="h3">${esc(app.name)}</h3>
     <p class="tile-desc">${esc(app.description || app.tagline || '')}</p>
     <div class="tile-foot"><span class="label">${esc(versionLabel(app))}</span>
@@ -63,7 +86,7 @@ function webCard(app) {
   const live = !!app.live_url
   const source = !!app.repo_url
   return `<article class="card web-card">
-    <div class="web-thumb">WEB / ${esc(app.name.slice(0, 2).toUpperCase())}</div>
+    <div class="web-thumb" style="overflow:hidden">${previewHtml(app)}</div>
     <div class="web-body">
       <div class="tile-top"><h3 class="h3">${esc(app.name)}</h3><span class="badge">WEB</span></div>
       <p class="lead">${esc(app.tagline || '')}</p>
@@ -98,10 +121,11 @@ function seedFor(slug) {
 
 function webDetail(app) {
   return `<div class="detail-head">
-      <span class="tile-icon detail-icon">${esc(app.name.slice(0, 2).toUpperCase())}</span>
+      ${iconHtml(app, true)}
       <div><span class="badge">WEB</span><h1 class="h1" style="margin-top:12px">${esc(app.name)}</h1>
       <p class="lead" style="margin-top:8px">${esc(app.tagline || '')}</p></div>
     </div>
+    <div class="web-thumb" style="overflow:hidden;aspect-ratio:9/16;max-height:560px">${previewHtml(app)}</div>
     <div class="stack">
       <p class="body secondary">${esc(app.description || '')}</p>
       <div class="chip-row">${(app.stack || []).map((chip) => `<span class="chip">${esc(chip)}</span>`).join('')}</div>
@@ -126,7 +150,7 @@ function apkDetail(app, detail) {
       </div>`).join('')
     : '<p class="body muted">Belum ada riwayat rilis.</p>'
   return `<div class="detail-head">
-      <span class="tile-icon detail-icon">${esc(app.name.slice(0, 2).toUpperCase())}</span>
+      ${iconHtml(app, true)}
       <div><span class="badge">RILIS</span><h1 class="h1" style="margin-top:12px">${esc(app.name)}</h1>
       <p class="lead" style="margin-top:8px">${esc(app.tagline || '')}</p></div>
     </div>

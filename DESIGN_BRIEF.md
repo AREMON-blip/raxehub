@@ -39,7 +39,7 @@ sendiri (graphite + mark RAXE).
 
 ## 3. Layout yang Dibutuhkan
 
-Nav final: **Home | APK | Web | Keluar** (F8, tanpa kata "My").
+Nav public final: **Home | APK | Web** (F8, tanpa kata "My", zero login surface F1 AMEND — Keluar HANYA di session admin). CTA hero: "Buka karya".
 
 ### 3.0 Landing `/` (Home, F8 + F11)
 - **Hero full-viewport:** RAXE mecha-R mark + wordmark, tagline workshop,

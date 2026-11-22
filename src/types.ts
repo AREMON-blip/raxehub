@@ -5,6 +5,7 @@ export interface R2BucketLike {
 
 export interface Env {
   CLERK_SECRET_KEY?: string
+  CLERK_PUBLISHABLE_KEY?: string
   DATABASE_URL?: string
   ADMIN_EMAIL: string
   R2_ACCOUNT_ID: string
@@ -27,6 +28,10 @@ export interface AppRow {
   tagline: string | null
   description: string | null
   status: 'released' | 'coming-soon'
+  type?: 'apk' | 'web'
+  live_url?: string | null
+  repo_url?: string | null
+  stack?: string[] | string | null
   sort: number
   created_at: string
 }

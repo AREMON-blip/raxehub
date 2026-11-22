@@ -106,5 +106,19 @@ async function bootAdmin(identity) {
   })
 }
 
-const identity = await ensureIdentity()
-if (identity) await bootAdmin(identity)
+const gate = document.getElementById('admin-gate')
+const content = document.getElementById('admin-content')
+
+try {
+  const identity = await ensureIdentity()
+  if (identity) {
+    await api('/api/admin/me', { identity })
+    gate.hidden = true
+    content.hidden = false
+    await bootAdmin(identity)
+  }
+} catch (error) {
+  gate.innerHTML = `<div class="card"><h1 class="h2">Akses admin ditolak</h1>
+    <p class="lead" style="margin-top:12px">${esc(error.message || 'Verifikasi akun gagal.')}</p>
+    <a class="btn btn-secondary" href="/" style="margin-top:20px">Kembali ke beranda</a></div>`
+}

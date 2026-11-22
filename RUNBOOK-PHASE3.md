@@ -12,25 +12,25 @@
 3. **Verify home:** hero mark RAXE, section "Tentang" (teks lock), 3 tile rilis
    (KROMA, Tabungku, GPS Tracker), 2 kartu Web. Screenshot dapet bukti A3.
 
-## 2. Upload APK rilis pertama (GPS Tracker)
+## 2. Upload APK rilis pertama (KROMA)
 
-1. Siapkan **signed release APK** — ambil dari Foreman build gps-tracker v2.0
-   (`D:/default project/gps-tracker/app/build/outputs/apk/release/`).
-   Jangan debug APK.
-2. Buka `/admin` → pilih app **GPS Tracker** → isi form:
-   - versionName: `2.0.1` (atau versionCode bump terbaru)
-   - versionCode: angka `versionCode` Manifest
-   - releaseNotes: changelog singkat
+1. Siapkan **signed release APK**:
+   `D:/default project/kroma/androidApp/build/outputs/apk/release/androidApp-release.apk`
+   — verified: v14.0.1, versionCode 155, 15.5 MB, APK Sig Block v2/v3 present.
+2. Buka `/admin` (direct URL) → login Clerk (admin email) → pilih app **KROMA**:
+   - versionName: `14.0.1`
+   - versionCode: `155`
+   - releaseNotes: changelog singkat (cek `kroma/` CHANGELOG bila ada)
 3. Pilih file APK → browser hash SHA-256 client-side (progress bar) →
    PUT presigned ke R2 → metadata insert Neon otomatis
-4. **Verify:** detail GPS Tracker sekarang muncul versi + tombol Download aktif
+4. **Verify:** detail KROMA sekarang muncul versi + tombol Download aktif
 
 **Note:** APK > 80 MB ditolak form → turf: sign release shrinkResources,
 atau split ABI (universal preferred, PRD standing default).
 
 ## 3. Smoke test download (A4)
 
-1. Klik Download di detail GPS Tracker
+1. Klik Download di detail KROMA (anonim)
 2. Response harus **302 redirect otomatis** — browser mulai download file, no new tab
 3. Setelah download: `shasum -a 256 <file.apk>` di terminal / HP
 4. **Verify:** SHA256 file == nilai di detail page == DB (MATCH = A4 PASS)

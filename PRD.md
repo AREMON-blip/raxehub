@@ -67,11 +67,16 @@ APK-nya belum ada (KROMA, agent-virtual-studio, dll). Bukan mockup kosong tanpa 
 
 ## 4. Kebutuhan Fungsional
 
-**F1 — Publik anonim, admin-only auth (PIVOT 2026-11-23).** Browsing + download
-**tanpa login** untuk siapa saja. Clerk discope hanya buat `/admin` + `/api/admin/*`
-(upload, insert metadata). Semua route publik (`/`, `/apk`, `/web`, `/app/:slug`,
-`/api/apps`, `/api/download`) bypass auth. Whitelist email circle **dihapus**.
-Rute admin wajib session Clerk email admin (`ADMIN_EMAIL`). Lihat §9.
+**F1 — Publik anonim, admin tersembunyi (PIVOT 2026-11-23; AMEND 01:55).** Browsing +
+download **tanpa login** untuk siapa saja. Clerk discope hanya buat `/api/admin/*`.
+Semua route publik bypass auth. Whitelist email circle **dihapus**.
+
+**Zero login surface (AMEND):** route publik **DILARANG** memunculkan UI/copy
+bertema autentikasi (nav Keluar, tombol Masuk/Login, kata "login" di meta/copy).
+`/admin` reachable **hanya via direct URL** — kolepsi tertutup (security by obscurity
+= LAYER TAMBAHAN, bukan pengganti auth; session Clerk + `ADMIN_EMAIL` tetap guard).
+Nav Keluar muncul **hanya** pas session admin. CTA hero: "Buka karya" (bukan
+"Masuk library"). Lihat §9.
 
 **F2 — Katalog (library).** Grid kartu app: icon R2, nama, tagline, chip versi terbaru,
 status (`released` / `coming-soon`). Klik kartu → halaman detail.
@@ -228,7 +233,26 @@ Planner gak nulis kode.
 5. **Egress Neon 5 GB/bln** — API JSON kecil, gak mungkin ketemu (R2 egress = 0 biaya).
 6. **Status coming-soon = manual** — admin set sendiri, gak auto-detect.
 
-## 9. Seed Data Web Karya (Terverifikasi Live 2026-11-22)
+## 9.5 Copy Deskripsi Singkat (LOCK 2026-11-23 — natural, fitur utama, no-slop)
+
+Wajib dipakai presisi di seed.sql, Neon, frontend fallback. Gak boleh dipendekkan
+lagi (telah diberes clearing 'terlalu kering').
+
+- **kroma** — tagline: `Pemutar musik lokal, tanpa akun`
+  desc: `Pemutar musik buat berkas audio lokal di HP. Susun antrian sendiri, pasang
+  sleep timer, putar offline. Gak ada akun, gak ada iklan, gak ngumpulin data.`
+- **tabungku** — tagline: `Tabungan dengan tujuan`
+  desc: `Satu tujuan, satu tabungan. Bikin target, catat setoran, sisa target
+  kelihatan langsung di layar utama. Semua data disimpan di HP, gak ada cloud.`
+- **gps-tracker** — tagline: `Catat jejak perjalanan HP`
+  desc: `Lacak posisi HP otomatis: rute harian, jarak tempuh, riwayat bisa diputar
+  ulang. Data 100% lokal, tanpa server, tanpa orang lain yang bisa lihat.`
+- **tahun-baru-countdown** — tagline: `Hitung mundur tahun baru`
+  desc: `Angka live tersinkron lewat Firebase — semua yang buka lihat hitungan yang
+  sama persis. Dipakai buat countdown bareng grup.`
+- **crypto-blog** — tagline: `Catatan tulisan crypto`
+  desc: `Kumpulan analisis dan catatan teknis crypto yang gw pelajari. Bukan sinyal
+  trading, bukan ajakan beli apa pun.`
 
 | Karya | live_url | Stack | Status |
 |---|---|---|---|

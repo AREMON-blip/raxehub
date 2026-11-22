@@ -70,7 +70,9 @@
 > Jalankan via `RUNBOOK-PHASE3.md` — upload APK rilis pertama (gps-tracker signed
 > release) + smoke test download/install di A21s. 15 menit.
 
-- **3.1** Upload gps-tracker v2.0 APK rilis (signed release artifact Foreman).
+- **3.1** Upload **KROMA v14.0.1** (versionCode 155) APK rilis signed —
+  `D:/default project/kroma/androidApp/build/outputs/apk/release/androidApp-release.apk`
+  (verified: 15.5 MB, APK Sig Block v2/v3).
   Verify: katalog root tampil + tombol Download functional. v1.2: katalog KROMA +
   Tabungku + GPS Tracker semua Rilis (F6 coming-soon DROPPED); seed row DB sesuai.
 - **3.2** Test install di A21s: download → install unknown apps → jalan. Screenshot bukti.

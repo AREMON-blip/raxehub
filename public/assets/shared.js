@@ -2,29 +2,29 @@ export const PK = window.RAXEHUB_CLERK_PUBLISHABLE_KEY || ''
 
 export const APK_SEED = [
   {
-    slug: 'kroma', name: 'KROMA', tagline: 'Player musik pribadi.',
-    description: 'Putar berkas lokal di HP. Antrian, sleep timer, tanpa akun.', status: 'released',
+    slug: 'kroma', name: 'KROMA', tagline: 'Pemutar musik lokal, tanpa akun',
+    description: 'Pemutar musik buat berkas audio lokal di HP. Susun antrian sendiri, pasang sleep timer, putar offline. Gak ada akun, gak ada iklan, gak ngumpulin data.', status: 'released',
   },
   {
-    slug: 'tabungku', name: 'Tabungku', tagline: 'Tabungan berdasar tujuan.',
-    description: 'Satu tujuan, satu tabungan. Catat setoran, lihat sisa target.', status: 'released',
+    slug: 'tabungku', name: 'Tabungku', tagline: 'Tabungan dengan tujuan',
+    description: 'Satu tujuan, satu tabungan. Bikin target, catat setoran, sisa target kelihatan langsung di layar utama. Semua data disimpan di HP, gak ada cloud.', status: 'released',
   },
   {
-    slug: 'gps-tracker', name: 'GPS Tracker', tagline: 'Pelacak lokasi.',
-    description: 'Lacak posisi HP. Riwayat rute, tanpa toko.', status: 'released',
+    slug: 'gps-tracker', name: 'GPS Tracker', tagline: 'Catat jejak perjalanan HP',
+    description: 'Lacak posisi HP otomatis: rute harian, jarak tempuh, riwayat bisa diputar ulang. Data 100% lokal, tanpa server, tanpa orang lain yang bisa lihat.', status: 'released',
   },
 ]
 
 export const WEB_SEED = [
   {
-    slug: 'tahun-baru-countdown', name: 'Tahun Baru Countdown', tagline: 'Callsign Radio.',
-    description: 'Hitung mundur tahun baru. Angka live Firebase, bukan palsu.',
+    slug: 'tahun-baru-countdown', name: 'Tahun Baru Countdown', tagline: 'Hitung mundur tahun baru',
+    description: 'Angka live tersinkron lewat Firebase — semua yang buka lihat hitungan yang sama persis. Dipakai buat countdown bareng grup.',
     stack: ['Next.js', 'Firebase', 'Vercel'],
     live_url: 'https://tahun-baru-countdown-eosin.vercel.app/', repo_url: '',
   },
   {
-    slug: 'crypto-blog', name: 'Crypto Blog', tagline: 'Catatan beranda.',
-    description: 'Tulisan crypto di Vercel. Next 16. Bukan sinyal trading.',
+    slug: 'crypto-blog', name: 'Crypto Blog', tagline: 'Catatan tulisan crypto',
+    description: 'Kumpulan analisis dan catatan teknis crypto yang gw pelajari. Bukan sinyal trading, bukan ajakan beli apa pun.',
     stack: ['Next.js 16', 'Vercel'],
     live_url: 'https://crypto-blog-ten.vercel.app/beranda', repo_url: '',
   },
@@ -48,10 +48,11 @@ export const finePointer = () => window.matchMedia('(hover: hover) and (pointer:
 const isLocalHost = () =>
   /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || location.hostname.endsWith('.localhost')
 
-export function loadScript(src) {
+export function loadScript(src, attributes = {}) {
   return new Promise((resolve, reject) => {
     const tag = document.createElement('script')
     tag.src = src
+    for (const [name, value] of Object.entries(attributes)) tag.setAttribute(name, value)
     tag.onload = resolve
     tag.onerror = () => reject(new Error(`load failed: ${src}`))
     document.head.appendChild(tag)
@@ -67,7 +68,9 @@ let clerkLoad
 function loadClerk() {
   if (!clerkLoad) {
     clerkLoad = (async () => {
-      await loadScript('https://cdn.clerk.io/clerk.js')
+      await loadScript('https://certain-filly-1741.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js', {
+        'data-clerk-publishable-key': PK,
+      })
       await window.Clerk.load({ publishableKey: PK })
       return window.Clerk
     })()

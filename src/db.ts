@@ -94,7 +94,8 @@ export async function listApps(env: Env): Promise<AppSummary[]> {
 
   type Row = AppRow & { versionName: string | null; versionCode: number | null; sizeBytes: string | number | null }
   const rows = (await db(env)`
-    SELECT a.id, a.slug, a.name, a.tagline, a.description, a.status, a.sort, a.created_at,
+    SELECT a.id, a.slug, a.name, a.tagline, a.description, a.status,
+           a.type, a.live_url, a.repo_url, a.stack, a.sort, a.created_at,
            v.version_name AS "versionName", v.version_code AS "versionCode", v.size_bytes AS "sizeBytes"
     FROM apps a
     LEFT JOIN versions v ON v.id = (
@@ -110,6 +111,14 @@ export async function listApps(env: Env): Promise<AppSummary[]> {
     tagline: row.tagline,
     description: row.description,
     status: row.status,
+    type: row.type,
+    live_url: row.live_url,
+    repo_url: row.repo_url,
+    stack: Array.isArray(row.stack)
+      ? row.stack
+      : row.stack
+        ? row.stack.split(',').map((item: string) => item.trim()).filter(Boolean)
+        : [],
     sort: row.sort,
     created_at: row.created_at,
     latestVersion:
