@@ -1,6 +1,8 @@
 import { authenticate, isAdmin, isLocalTest } from '../src/auth'
 import type { Ctx } from '../src/types'
 
+const DEFAULT_CLERK_PK = 'pk_test_Y2VydGFpbi1maWxseS0xNzQxLmNsZXJrLmFjY291bnRzLmRldiQ'
+
 function clerkSignIn(publishableKey: string, request: Request): string | null {
   if (!/^pk_(test|live)_/.test(publishableKey)) return null
   const encoded = publishableKey.replace(/^pk_(test|live)_/, '').replace(/-/g, '+').replace(/_/g, '/')
@@ -24,7 +26,7 @@ export const onRequest = async (ctx: Ctx): Promise<Response> => {
 
   const identity = await authenticate(ctx.request, ctx.env)
   if (!identity) {
-    const signIn = clerkSignIn(ctx.env.CLERK_PUBLISHABLE_KEY ?? '', ctx.request)
+    const signIn = clerkSignIn(ctx.env.CLERK_PUBLISHABLE_KEY || DEFAULT_CLERK_PK, ctx.request)
     return Response.redirect(signIn ?? new URL('/rejected?code=E-AUTH', ctx.request.url).toString(), 302)
   }
   if (!isAdmin(identity.email, ctx.env)) {

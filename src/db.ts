@@ -187,7 +187,7 @@ export async function getDownloadTarget(
     SELECT v.apk_key AS "apkKey", v.version_name AS "versionName"
     FROM versions v JOIN apps a ON a.id = v.app_id
     WHERE a.slug = ${slug}
-      AND (${versionId ?? null}::text IS NULL OR v.id = ${versionId ?? null}::text)
+      AND (${versionId ?? null}::text IS NULL OR v.id::text = ${versionId ?? null}::text)
       AND (${versionId ?? null}::text IS NOT NULL OR v.active = true)
     ORDER BY v.created_at DESC
     LIMIT 1

@@ -5,3 +5,7 @@ pages_build_output_dir = "public"
 [[r2_buckets]]
 binding = "RAXEHUB_BUCKET"
 bucket_name = "raxehub-apk"
+
+[vars]
+R2_BUCKET = "raxehub-apk"
+CLERK_PUBLISHABLE_KEY = "pk_test_Y2VydGFpbi1maWxseS0xNzQxLmNsZXJrLmFjY291bnRzLmRldiQ"

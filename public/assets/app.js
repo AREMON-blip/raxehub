@@ -65,6 +65,12 @@ async function bootHome() {
   mount.innerHTML = skeletonCards(3)
   const apps = await loadCatalog('apk', APK_SEED)
   mount.innerHTML = apps.map((app, index) => tileHtml(app, index === 0)).join('')
+  const webMount = document.getElementById('home-web')
+  if (webMount) {
+    webMount.innerHTML = skeletonCards(2)
+    const webs = await loadCatalog('web', WEB_SEED)
+    webMount.innerHTML = webs.map(webCard).join('')
+  }
   wireCards()
   initLandingMotion()
 }

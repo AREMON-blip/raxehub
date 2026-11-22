@@ -265,14 +265,14 @@ export async function initLandingMotion() {
   const groups = document.querySelectorAll('.tiles [data-reveal]')
   if (groups.length) {
     gsap.from(groups, {
-      opacity: 0, y: 32, duration: 0.64, ease: 'power3.out', stagger: 0.1,
+      y: 16, duration: 0.5, ease: 'power3.out', stagger: 0.08,
       scrollTrigger: { trigger: '.tiles', start: 'top 85%', toggleActions: 'play none none none' },
     })
   }
   const about = document.querySelector('.tentang')
   if (about) {
     gsap.from(about, {
-      opacity: 0, y: 32, duration: 0.64, ease: 'power3.out',
+      y: 16, duration: 0.5, ease: 'power3.out',
       scrollTrigger: { trigger: about, start: 'top 85%', toggleActions: 'play none none none' },
     })
   }
