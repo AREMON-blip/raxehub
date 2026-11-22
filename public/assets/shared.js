@@ -68,10 +68,19 @@ let clerkLoad
 function loadClerk() {
   if (!clerkLoad) {
     clerkLoad = (async () => {
-      await loadScript('https://certain-filly-1741.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js', {
-        'data-clerk-publishable-key': PK,
+      const clerkDomain = atob(PK.split('_')[2]).slice(0, -1)
+      await Promise.all([
+        loadScript(`https://${clerkDomain}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`, {
+          'data-clerk-publishable-key': PK,
+          crossorigin: 'anonymous',
+        }),
+        loadScript(`https://${clerkDomain}/npm/@clerk/ui@1/dist/ui.browser.js`, {
+          crossorigin: 'anonymous',
+        }),
+      ])
+      await window.Clerk.load({
+        ui: { ClerkUI: window.__internal_ClerkUICtor },
       })
-      await window.Clerk.load({ publishableKey: PK })
       return window.Clerk
     })()
   }
@@ -86,10 +95,18 @@ export async function ensureIdentity(mountEl = null) {
   if (PK) {
     const clerk = await loadClerk()
     if (!clerk.user) {
-      await clerk.redirectToSignIn({
-        signInFallbackRedirectUrl: '/admin',
-        signInForceRedirectUrl: '/admin',
-      })
+      if (mountEl) {
+        mountEl.innerHTML = '<div id="clerk-signin" style="display:flex;justify-content:center;padding-block:24px"></div>'
+        clerk.mountSignIn(mountEl.querySelector('#clerk-signin'), {
+          forceRedirectUrl: '/admin',
+          fallbackRedirectUrl: '/admin',
+        })
+      } else {
+        await clerk.redirectToSignIn({
+          signInFallbackRedirectUrl: '/admin',
+          signInForceRedirectUrl: '/admin',
+        })
+      }
       return null
     }
     return { email: clerk.user.primaryEmailAddress?.emailAddress || '', dev: false }
