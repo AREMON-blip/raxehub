@@ -68,7 +68,7 @@ let clerkLoad
 function loadClerk() {
   if (!clerkLoad) {
     clerkLoad = (async () => {
-      await loadScript('https://certain-filly-1741.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js', {
+      await loadScript('https://certain-filly-1741.clerk.accounts.dev/npm/@clerk/clerk-js@6/dist/clerk.browser.js', {
         'data-clerk-publishable-key': PK,
       })
       await window.Clerk.load({ publishableKey: PK })
