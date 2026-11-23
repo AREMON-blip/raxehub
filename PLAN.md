@@ -133,4 +133,5 @@ Setelah Raxe pilih konsep, Artisan finalize DESIGN.md + asset PNG, Forge baru la
 | NEON+PUSH | ✅ DONE | Neon schema 3 table + 5 seed row live. Push Round 2 c4b1800, Round 3 85c39b5, Clerk v6 f9c9fba, 59a9851 → origin/main live. `/api/apps` 5 row type field OK |
 | GATE 3 | ✅ UPLOAD PASS | KROMA v1.0 live: R2 `apps/KROMA/KROMA-v1.0-release-1.0.apk` (15,499,843 byte), `/api/download/kroma` 302 attachment CF-RAY a5ebcf20ff83c5f0, SHA256 `5581e003…1324`, versionName 1.0 vc 155. Commit 59a9851 (Clerk v6 + R2 CORS + logo fix + Tampilan wired). Tabungku & GPS upload = berikutnya |
 | GATE 3b | ✅ LOKAL | Screen pack 9 slot (kroma, tabungku, gps-tracker ×3) wired `STATIC_SHOTS` DB prioritas. Puppeteer 360/1080 9/9 render, hash match. Microupdate Tabungku (msg 14458). **Unpushed — nunggu Vanguard Round 4** |
-| GATE 4 | ⏳ | Upload Tabungku + GPS APK → install A21s → shasum match → launch |
+| GATE 5 Screenshot | ✅ PASS PROD | commit 66e928c. `/app/{kroma,tabungku,gps-tracker}` 3/3 slot each, asset `/screenshots/*-1..3.png` 200. CF-RAY a5ec67b3584cb5ee-CGK |
+| GATE 5b Disable | 🔨 FORGE | Tombol Unduh auto-disabled saat `latestVersion === null` (Tabungku/GPS belum rilis). Spec `ARCHITECTURE.md` F-DISABLE |

@@ -109,6 +109,8 @@ h1, h2, h3, p { margin: 0; }
   cursor: not-allowed; box-shadow: none;
 }
 .btn[disabled]:active, .btn[aria-disabled='true']:active { transform: none; }
+.btn:disabled { background: var(--secondary); color: var(--muted); cursor: not-allowed; }
+.btn:disabled:hover { background: var(--secondary); color: var(--muted); }
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
 
 /* cards */

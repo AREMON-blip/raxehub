@@ -167,6 +167,14 @@ created (upload selesai, row insert)
 coming-soon (tidak punya version row) ↔ released (≥1 version active)
 ```
 
+### Tombol Unduh auto-disabled (F-DISABLE, 2026-11-23)
+- Trigger: `latestVersion === null` (row `versions` kosong di Neon per slug)
+- Detail `/app/:slug`: anchor Unduh → `<button class="btn btn-primary" disabled>Belum ada rilis</button>`
+- Field select Versi disembunyikan saat `versions.length === 0`; SHA256 box tetap "Tersedia setelah versi dirilis."
+- `.btn:disabled`: bg `--secondary`, color `--muted`, `cursor: not-allowed`, hover freeze (NO glow)
+- Server tetap fail-closed: `/api/download/:slug` tanpa version row → 404 (tidak bergantung UI)
+- Tile `/apk` sebagai `/web` — tombol nonaktif sudah ada pola `.field` placeholder
+
 ## 6. Failure Modes
 
 | Failure | Trigger | Behavior | Mitigasi |

@@ -178,12 +178,12 @@ function apkDetail(app, detail) {
         <section class="stack"><h2 class="h2">Changelog</h2>${changelog}</section>
       </div>
       <aside class="stack">
-        <div class="field"><label class="label" for="version-select">Versi</label>
+        <div class="field"${versions.length ? '' : ' style="display:none"'}><label class="label" for="version-select">Versi</label>
           <select id="version-select"><option value="">Terbaru</option>
             ${versions.map((item) => `<option value="${esc(item.id)}">v${esc(item.version_name)}</option>`).join('')}
           </select>
         </div>
-        <div class="btn-row">${downloadControl(app.slug)}</div>
+        <div class="btn-row">${latest ? downloadControl(app.slug) : '<button class="btn btn-primary" disabled type="button">Belum ada rilis</button>'}</div>
         <div class="status-line" data-status></div>
         <div class="stack">
           <h3 class="h3">Integritas berkas</h3>
