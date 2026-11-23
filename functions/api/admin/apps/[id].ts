@@ -17,6 +17,8 @@ export const onRequest = route(async ({ env, params, request }) => {
     patch.status = status as AppRow['status']
   }
   if (body.sort !== undefined) patch.sort = num(body.sort, 'sort')
+  const iconKey = body.icon_key ?? body.iconKey
+  if (iconKey !== undefined) patch.icon_key = optionalStr(iconKey, 'icon_key')
 
   const app = await updateApp(env, params.id ?? '', patch)
   if (!app) throw new ApiError(404, 'E-NOTFOUND', 'app not found')

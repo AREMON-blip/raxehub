@@ -29,9 +29,9 @@
 ## 2b. Upload lanjutan (Tabungku + GPS Tracker)
 
 **Tabungku** (`D:/unduhan/tabungku-v3.0.0-arm64-vc13.apk`, 19,316,456 B, sig v2/v3):
-- versionName `3.0.0`, versionCode `13`. Splits: arm64 (A21s arm64 — OK; note arm-only)
+- versionName `0.3` (rename publik Raxe), versionCode `13`. Splits: arm64 (A21s arm64 — OK; note arm-only)
 **GPS Tracker** (`D:/unduhan/gpstracker-v2.0.6-release.apk`, 8,412,843 B, sig v2/v3):
-- versionName `2.0.6`, versionCode `14`
+- versionName `0.26` (rename publik Raxe), versionCode `14`
 Flow sama: `/admin` → pilih app → isi → upload → verify detail page versi + Download aktif.
 
 ## 3. Smoke test download (A4)

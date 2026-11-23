@@ -2,6 +2,7 @@ import { ApiFailure, api, esc, ensureIdentity, listApps, renderChrome, signOut }
 import { sha256File } from './sha256.js'
 
 const MAX_UPLOAD_BYTES = 80 * 1024 * 1024
+const MAX_ICON_BYTES = 2 * 1024 * 1024
 const $ = (selector) => document.querySelector(selector)
 const status = (message) => { $('[data-status]').textContent = message }
 const progress = (selector, ratio) => { $(selector).style.width = `${Math.round(ratio * 100)}%` }
@@ -19,22 +20,33 @@ function putFile(url, file, onProgress) {
   })
 }
 
-async function resolveAppId(identity, form) {
-  const slug = form.slug.value.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '')
+const cleanSlug = (value) => value.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '')
+
+function appFields(form, iconKey) {
+  return {
+    name: form.name.value.trim(),
+    tagline: form.tagline.value.trim() || null,
+    description: form.description.value.trim() || null,
+    status: form.status.value,
+    sort: Number(form.sort.value) || 0,
+    ...(iconKey ? { icon_key: iconKey } : {}),
+  }
+}
+
+// Existing app -> PATCH metadata so the form is never dead; unknown slug -> auto-create.
+async function resolveAppId(identity, form, iconKey) {
+  const slug = cleanSlug(form.slug.value)
   const existing = await listApps(identity, 'apk')
   const found = existing.find((app) => app.slug === slug)
-  if (found) return found.id
+  if (found) {
+    await api(`/api/admin/apps/${encodeURIComponent(found.id)}`, {
+      identity, method: 'PATCH', body: appFields(form, iconKey),
+    })
+    return found.id
+  }
   try {
     const created = await api('/api/admin/apps', {
-      identity, method: 'POST',
-      body: {
-        slug,
-        name: form.name.value.trim(),
-        tagline: form.tagline.value.trim() || null,
-        description: form.description.value.trim() || null,
-        status: form.status.value,
-        sort: Number(form.sort.value) || 0,
-      },
+      identity, method: 'POST', body: { slug, ...appFields(form, iconKey) },
     })
     return created.app.id
   } catch (error) {
@@ -45,10 +57,58 @@ async function resolveAppId(identity, form) {
   }
 }
 
+const NEW_APP = '__new__'
+
+async function refreshAppSelect(identity, form, selectedSlug = NEW_APP) {
+  const select = form.appSelect
+  const apps = await listApps(identity, 'apk')
+  select.innerHTML = `<option value="${NEW_APP}">+ App baru (buat otomatis)</option>${apps
+    .map((app) => `<option value="${esc(app.slug)}">${esc(app.name)} (${esc(app.slug)})</option>`)
+    .join('')}`
+  select.value = apps.some((app) => app.slug === selectedSlug) ? selectedSlug : NEW_APP
+  applyAppSelection(form, apps)
+  return apps
+}
+
+function applyAppSelection(form, apps) {
+  const chosen = apps.find((app) => app.slug === form.appSelect.value)
+  form.slug.readOnly = !!chosen
+  if (chosen) {
+    form.slug.value = chosen.slug
+    form.name.value = chosen.name || ''
+    form.tagline.value = chosen.tagline || ''
+    form.description.value = chosen.description || ''
+    form.status.value = chosen.status || 'released'
+    form.sort.value = chosen.sort ?? 0
+  } else {
+    form.slug.value = ''
+    form.name.value = ''
+    form.tagline.value = ''
+    form.description.value = ''
+    form.status.value = 'released'
+  }
+}
+
+async function uploadIcon(identity, form, slug) {
+  const file = form.icon.files[0]
+  if (!file) return null
+  if (file.type !== 'image/png' && !/\.png$/i.test(file.name)) throw new Error('Logo harus berformat PNG.')
+  if (file.size === 0 || file.size > MAX_ICON_BYTES) throw new Error('Ukuran logo harus antara 1 byte dan 2 MB.')
+  status('Meminta presign logo…')
+  const signed = await api('/api/admin/presign-icon', {
+    identity, method: 'POST', body: { slug, sizeBytes: file.size },
+  })
+  status('Mengunggah logo ke R2…')
+  await putFile(signed.uploadUrl, file, () => {})
+  return signed.key
+}
+
 async function bootAdmin(identity) {
   renderChrome('', ['Unggah APK langsung dari HP ke penyimpanan Raxe.'], { showSignOut: true })
   const form = document.getElementById('admin-form')
   const submit = form.querySelector('button[type="submit"]')
+  let appCache = await refreshAppSelect(identity, form)
+  form.appSelect.addEventListener('change', () => applyAppSelection(form, appCache))
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
     status('')
@@ -60,8 +120,11 @@ async function bootAdmin(identity) {
     if (file.size === 0 || file.size > MAX_UPLOAD_BYTES) {
       return status('Ukuran APK harus antara 1 byte dan 80 MB.')
     }
+    const slug = cleanSlug(form.slug.value)
+    if (!slug) return status('Slug tidak valid.')
     submit.disabled = true
     try {
+      const iconKey = await uploadIcon(identity, form, slug)
       status('Menghitung SHA256…')
       const sha256 = await sha256File(file, (ratio) => progress('#hash-bar', ratio))
       status('Meminta presign R2…')
@@ -71,14 +134,14 @@ async function bootAdmin(identity) {
           fileName: file.name,
           sizeBytes: file.size,
           sha256,
-          slug: form.slug.value.trim(),
+          slug,
           versionName: form.versionName.value.trim(),
         },
       })
       status('Mengunggah ke R2…')
       await putFile(signed.uploadUrl, file, (ratio) => progress('#upload-bar', ratio))
       status('Menyimpan metadata…')
-      const appId = await resolveAppId(identity, form)
+      const appId = await resolveAppId(identity, form, iconKey)
       await api('/api/admin/versions', {
         identity, method: 'POST',
         body: {
@@ -93,7 +156,8 @@ async function bootAdmin(identity) {
         },
       })
       status(`Selesai. ${signed.key}`)
-      $('#admin-result').innerHTML = `<a class="btn btn-secondary" href="/app/${esc(form.slug.value.trim().toLowerCase())}" style="margin-top:16px">Lihat detail app</a>`
+      $('#admin-result').innerHTML = `<a class="btn btn-secondary" href="/app/${esc(slug)}" style="margin-top:16px">Lihat detail app</a>`
+      appCache = await refreshAppSelect(identity, form, slug)
     } catch (error) {
       if (error instanceof ApiFailure && error.status === 403) {
         status('Akses admin ditolak. Masuk sebagai admin untuk mengunggah.')

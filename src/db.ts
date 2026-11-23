@@ -61,6 +61,20 @@ function db(env: Env) {
   return neon(env.DATABASE_URL)
 }
 
+let schemaReady: Promise<void> | null = null
+
+// Idempotent runtime migration so prod Neon gains icon_key without a manual SQL step.
+async function ensureSchema(env: Env): Promise<void> {
+  if (isLocalTest(env)) return
+  schemaReady ??= (async () => {
+    await db(env)`ALTER TABLE apps ADD COLUMN IF NOT EXISTS icon_key text`
+  })().catch((error) => {
+    schemaReady = null
+    throw error
+  })
+  await schemaReady
+}
+
 function latestVersion(appId: string): VersionRow | null {
   return store.versions.find((version) => version.app_id === appId && version.active) ?? null
 }
@@ -93,9 +107,10 @@ export async function listApps(env: Env): Promise<AppSummary[]> {
   }
 
   type Row = AppRow & { versionName: string | null; versionCode: number | null; sizeBytes: string | number | null }
+  await ensureSchema(env)
   const rows = (await db(env)`
     SELECT a.id, a.slug, a.name, a.tagline, a.description, a.status,
-           a.type, a.live_url, a.repo_url, a.stack, a.sort, a.created_at,
+           a.type, a.live_url, a.repo_url, a.stack, a.icon_key, a.sort, a.created_at,
            v.version_name AS "versionName", v.version_code AS "versionCode", v.size_bytes AS "sizeBytes"
     FROM apps a
     LEFT JOIN versions v ON v.id = (
@@ -114,6 +129,7 @@ export async function listApps(env: Env): Promise<AppSummary[]> {
     type: row.type,
     live_url: row.live_url,
     repo_url: row.repo_url,
+    icon_key: row.icon_key ?? null,
     stack: Array.isArray(row.stack)
       ? row.stack
       : row.stack
@@ -151,6 +167,7 @@ export async function getAppDetail(
   }
 
   const sql = db(env)
+  await ensureSchema(env)
   const apps = (await sql`SELECT * FROM apps WHERE slug = ${slug} LIMIT 1`) as unknown as AppRow[]
   const app = apps[0]
   if (!app) return null
@@ -196,6 +213,22 @@ export async function getDownloadTarget(
   return rows[0] ?? null
 }
 
+export async function getIconTarget(
+  env: Env,
+  slug: string,
+): Promise<{ slug: string; iconKey: string } | null> {
+  if (isLocalTest(env)) {
+    const app = store.apps.find((item) => item.slug === slug)
+    return app ? { slug: app.slug, iconKey: app.icon_key || `icons/${app.slug}.png` } : null
+  }
+  await ensureSchema(env)
+  const rows = (await db(env)`
+    SELECT slug, icon_key AS "iconKey" FROM apps WHERE slug = ${slug} LIMIT 1
+  `) as unknown as Array<{ slug: string; iconKey: string | null }>
+  const row = rows[0]
+  return row ? { slug: row.slug, iconKey: row.iconKey || `icons/${row.slug}.png` } : null
+}
+
 export interface NewApp {
   slug: string
   name: string
@@ -203,6 +236,7 @@ export interface NewApp {
   description: string | null
   status: AppRow['status']
   sort: number
+  icon_key?: string | null
 }
 
 export async function insertApp(env: Env, input: NewApp): Promise<AppRow> {
@@ -219,9 +253,10 @@ export async function insertApp(env: Env, input: NewApp): Promise<AppRow> {
     return app
   }
 
+  await ensureSchema(env)
   const rows = (await db(env)`
-    INSERT INTO apps (slug, name, tagline, description, status, sort)
-    VALUES (${input.slug}, ${input.name}, ${input.tagline}, ${input.description}, ${input.status}, ${input.sort})
+    INSERT INTO apps (slug, name, tagline, description, status, sort, icon_key)
+    VALUES (${input.slug}, ${input.name}, ${input.tagline}, ${input.description}, ${input.status}, ${input.sort}, ${input.icon_key ?? null})
     RETURNING *
   `) as unknown as AppRow[]
   return rows[0]
@@ -316,6 +351,7 @@ export interface AppPatch {
   description?: string | null
   status?: AppRow['status']
   sort?: number
+  icon_key?: string | null
 }
 
 export async function updateApp(env: Env, id: string, patch: AppPatch): Promise<AppRow | null> {
@@ -326,13 +362,15 @@ export async function updateApp(env: Env, id: string, patch: AppPatch): Promise<
     return app
   }
 
+  await ensureSchema(env)
   const rows = (await db(env)`
     UPDATE apps SET
       name = COALESCE(${patch.name ?? null}, name),
       tagline = COALESCE(${patch.tagline ?? null}, tagline),
       description = COALESCE(${patch.description ?? null}, description),
       status = COALESCE(${patch.status ?? null}, status),
-      sort = COALESCE(${patch.sort ?? null}, sort)
+      sort = COALESCE(${patch.sort ?? null}, sort),
+      icon_key = COALESCE(${patch.icon_key ?? null}, icon_key)
     WHERE id = ${id}
     RETURNING *
   `) as unknown as AppRow[]

@@ -32,6 +32,7 @@ export interface AppRow {
   live_url?: string | null
   repo_url?: string | null
   stack?: string[] | string | null
+  icon_key?: string | null
   sort: number
   created_at: string
 }

@@ -190,24 +190,32 @@ export function skeletonCards(count = 3) {
 }
 
 export async function listApps(identity, type) {
-  const data = await api(`/api/apps?type=${encodeURIComponent(type)}`, { identity })
-  return Array.isArray(data?.apps) ? data.apps : []
+  const data = await api(`/api/apps${type ? `?type=${encodeURIComponent(type)}` : ''}`, { identity })
+  const rows = Array.isArray(data?.apps) ? data.apps : []
+  return type ? rows.filter((item) => (item.type || 'apk') === type) : rows
 }
 
+// DB-first union: live rows win; seed only fills slugs missing from DB (or everything when DB is down/empty).
 export function mergeCatalog(seed, live) {
-  const bySlug = new Map((live || []).map((item) => [item.slug, item]))
-  return seed.map((item) => {
-    const row = bySlug.get(item.slug)
-    if (!row) return item
+  if (!Array.isArray(live) || !live.length) return seed
+  const seedBySlug = new Map((seed || []).map((item) => [item.slug, item]))
+  const merged = live.map((row) => {
+    const base = seedBySlug.get(row.slug) || {}
     return {
-      ...item,
-      status: row.status || item.status,
+      ...base,
+      ...row,
+      name: row.name || base.name,
+      tagline: row.tagline || base.tagline || '',
+      description: row.description || base.description || '',
+      icon_key: row.icon_key || null,
+      live_url: row.live_url || base.live_url || '',
+      repo_url: row.repo_url ?? base.repo_url ?? '',
+      stack: Array.isArray(row.stack) && row.stack.length ? row.stack : base.stack || [],
       latestVersion: row.latestVersion || null,
-      live_url: row.live_url || item.live_url || '',
-      repo_url: row.repo_url ?? item.repo_url ?? '',
-      stack: Array.isArray(row.stack) ? row.stack : item.stack || [],
     }
   })
+  const liveSlugs = new Set(live.map((row) => row.slug))
+  return merged.concat((seed || []).filter((item) => !liveSlugs.has(item.slug)))
 }
 
 export function wireCards() {

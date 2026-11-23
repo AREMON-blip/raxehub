@@ -16,6 +16,7 @@ export const onRequest = route(async ({ env, request }) => {
     description: optionalStr(body.description, 'description'),
     status: status as AppRow['status'],
     sort: num(body.sort ?? 0, 'sort'),
+    icon_key: optionalStr(body.icon_key ?? body.iconKey, 'icon_key'),
   }
 
   return json({ app: await insertApp(env, input) }, 201)

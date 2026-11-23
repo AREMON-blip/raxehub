@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS apps (
   live_url text,
   repo_url text,
   stack text,
+  icon_key text,
   sort int NOT NULL DEFAULT 0,
   created_at timestamptz DEFAULT now()
 );
@@ -21,6 +22,7 @@ ALTER TABLE apps ADD COLUMN IF NOT EXISTS type text NOT NULL DEFAULT 'apk';
 ALTER TABLE apps ADD COLUMN IF NOT EXISTS live_url text;
 ALTER TABLE apps ADD COLUMN IF NOT EXISTS repo_url text;
 ALTER TABLE apps ADD COLUMN IF NOT EXISTS stack text;
+ALTER TABLE apps ADD COLUMN IF NOT EXISTS icon_key text;
 
 CREATE TABLE IF NOT EXISTS versions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

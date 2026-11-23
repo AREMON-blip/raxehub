@@ -28,6 +28,9 @@
 
       <form id="admin-form" class="card" style="margin-top:32px;display:grid;gap:24px">
         <div class="form-grid">
+          <div class="field" style="grid-column:1/-1"><label class="label" for="f-app-select">App</label>
+            <select id="f-app-select" name="appSelect"><option value="__new__">+ App baru (buat otomatis)</option></select>
+          </div>
           <div class="field"><label class="label" for="f-slug">Slug</label><input id="f-slug" name="slug" required placeholder="gps-tracker"></div>
           <div class="field"><label class="label" for="f-name">Nama</label><input id="f-name" name="name" required placeholder="GPS Tracker"></div>
           <div class="field"><label class="label" for="f-tagline">Tagline</label><input id="f-tagline" name="tagline" placeholder="Pelacak lokasi."></div>
@@ -40,6 +43,7 @@
           <div class="field" style="grid-column:1/-1"><label class="label" for="f-notes">Catatan rilis</label><textarea id="f-notes" name="releaseNotes" placeholder="Perubahan pada versi ini"></textarea></div>
           <div class="field"><label class="label" for="f-sort">Urutan</label><input id="f-sort" name="sort" type="number" value="0"></div>
           <div class="field"><label class="label" for="f-apk">Berkas APK (maks. 80 MB)</label><input id="f-apk" name="apk" type="file" accept=".apk" required></div>
+          <div class="field" style="grid-column:1/-1"><label class="label" for="f-icon">Logo (opsional, PNG 512px, maks. 2 MB)</label><input id="f-icon" name="icon" type="file" accept="image/png"></div>
         </div>
 
         <div class="stack">

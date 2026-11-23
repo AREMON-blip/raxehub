@@ -175,6 +175,58 @@ const patched = await req(`/api/admin/apps/${createdApp.data.app.id}`, {
 expect(patched, 200)
 assert.equal(patched.data.app.status, 'coming-soon')
 
+const iconPatch = await req(`/api/admin/apps/${createdApp.data.app.id}`, {
+  headers: ADMIN,
+  method: 'PATCH',
+  body: { description: 'Deskripsi baru', tagline: 'Tagline baru', icon_key: 'icons/new-app.png' },
+})
+expect(iconPatch, 200)
+assert.equal(iconPatch.data.app.description, 'Deskripsi baru')
+assert.equal(iconPatch.data.app.tagline, 'Tagline baru')
+assert.equal(iconPatch.data.app.icon_key, 'icons/new-app.png')
+
+const iconRedirect = await req('/api/icon/gps-tracker')
+expect(iconRedirect, 302)
+const iconUrl = new URL(iconRedirect.headers.get('location'))
+assert.match(iconUrl.host, /\.r2\.cloudflarestorage\.com$/)
+assert.match(iconUrl.pathname, /\/icons\/gps-tracker\.png$/)
+assert.equal(iconUrl.searchParams.get('X-Amz-Expires'), '3600')
+assert.equal(iconUrl.searchParams.get('response-content-disposition'), null)
+const iconDb = await req('/api/icon/new-app.png')
+expect(iconDb, 302)
+assert.match(new URL(iconDb.headers.get('location')).pathname, /\/icons\/new-app\.png$/)
+expect(await req('/api/icon/does-not-exist'), 404, 'E-NOTFOUND')
+
+const presignIcon = await req('/api/admin/presign-icon', {
+  headers: ADMIN, method: 'POST', body: { slug: 'new-app', sizeBytes: 4180 },
+})
+expect(presignIcon, 200)
+assert.match(presignIcon.data.key, /^icons\/new-app\.png$/)
+assert.equal(presignIcon.data.method, 'PUT')
+expect(
+  await req('/api/admin/presign-icon', {
+    headers: ADMIN, method: 'POST', body: { slug: 'new-app', sizeBytes: 3 * 1024 * 1024 },
+  }),
+  400,
+  'E-BODY',
+)
+expect(await req('/api/admin/presign-icon', { method: 'POST', body: { slug: 'x', sizeBytes: 1 } }), 401, 'E-AUTH')
+expect(
+  await req('/api/admin/presign-icon', { headers: CIRCLE, method: 'POST', body: { slug: 'x', sizeBytes: 1 } }),
+  403,
+  'E-AUTH',
+)
+
+// Union catalog: DB-only app appears, live wins over seed, seed fills only when DB is down.
+globalThis.window = {}
+const { mergeCatalog, APK_SEED } = await import('./public/assets/shared.js')
+const liveApps = (await req('/api/apps')).data.apps
+const union = mergeCatalog(APK_SEED, liveApps)
+assert.ok(union.some((app) => app.slug === 'new-app'), 'DB-only app must appear in union catalog')
+assert.equal(union.find((app) => app.slug === 'new-app').icon_key, 'icons/new-app.png')
+assert.equal(union.find((app) => app.slug === 'gps-tracker').name, 'GPS Tracker')
+assert.deepEqual(mergeCatalog(APK_SEED, []).map((app) => app.slug), APK_SEED.map((app) => app.slug))
+
 for (const path of [
   '/icons/kroma.png', '/icons/tabungku.png', '/icons/gps-tracker.png',
   '/previews/tahun-baru-countdown-360.png', '/previews/tahun-baru-countdown-1080.png',

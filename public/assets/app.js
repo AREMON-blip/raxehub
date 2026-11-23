@@ -8,7 +8,6 @@ function versionLabel(app) {
   return app?.latestVersion?.versionName ? `v${app.latestVersion.versionName}` : 'Rilis'
 }
 
-const ICON_SLUGS = new Set(['kroma', 'tabungku', 'gps-tracker'])
 const PREVIEW_SLUGS = new Set(['tahun-baru-countdown', 'crypto-blog'])
 const STATIC_SHOTS = {
   kroma: [1, 2, 3].map((n) => ({ src: `/screenshots/kroma-${n}.png`, caption: `Tampilan ${n}` })),
@@ -16,13 +15,19 @@ const STATIC_SHOTS = {
   'gps-tracker': [1, 2, 3].map((n) => ({ src: `/screenshots/gps-tracker-${n}.png`, caption: `Tampilan ${n}` })),
 }
 
+const ICON_FALLBACK_JS = "if(this.dataset.fallback&&!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallback}else{var p=this.parentNode;p.textContent=p.dataset.initials||'';p.removeAttribute('style')}"
+
+// 3-tier icon: DB icon_key (/api/icon/<slug>) > static /icons/<slug>.png > initials.
 function iconHtml(app, large = false) {
   const cls = `tile-icon${large ? ' detail-icon' : ''}`
-  if (!ICON_SLUGS.has(app.slug)) return `<span class="${cls}">${esc(app.name.slice(0, 2).toUpperCase())}</span>`
+  const initials = esc(app.name.slice(0, 2).toUpperCase())
   const size = large ? 96 : 64
-  return `<span class="${cls}" style="width:${size}px;height:${size}px;background:#19191B;border-color:#2A2A2C">
-    <img src="/icons/${encodeURIComponent(app.slug)}.png" alt="${esc(app.name)}" width="${size}" height="${size}"
-      loading="lazy" style="display:block;width:100%;height:100%;object-fit:contain">
+  const slug = encodeURIComponent(app.slug)
+  const primary = app.icon_key ? `/api/icon/${slug}` : `/icons/${slug}.png`
+  const fallback = app.icon_key ? `/icons/${slug}.png` : ''
+  return `<span class="${cls}" data-initials="${initials}" style="width:${size}px;height:${size}px;background:#19191B;border-color:#2A2A2C">
+    <img src="${primary}" data-fallback="${fallback}" alt="${esc(app.name)}" width="${size}" height="${size}"
+      loading="lazy" onerror="${ICON_FALLBACK_JS}" style="display:block;width:100%;height:100%;object-fit:contain">
   </span>`
 }
 
@@ -220,9 +225,16 @@ async function bootDetail() {
   }
   const live = detail?.app || null
   const app = live && seed
-    ? { ...live, name: seed.name || live.name, tagline: seed.tagline || live.tagline, description: seed.description || live.description }
+    ? {
+        ...seed,
+        ...live,
+        name: live.name || seed.name,
+        tagline: live.tagline || seed.tagline,
+        description: live.description || seed.description,
+        stack: Array.isArray(live.stack) && live.stack.length ? live.stack : seed.stack,
+      }
     : live || seed
-  const isWeb = WEB_SEED.some((item) => item.slug === slug)
+  const isWeb = (app.type || (WEB_SEED.some((item) => item.slug === slug) ? 'web' : 'apk')) === 'web'
   document.title = `${app.name} — RaxeHub`
   mount.innerHTML = `<div class="detail">${isWeb ? webDetail(app) : apkDetail(app, detail)}</div>`
   wireCopy()
