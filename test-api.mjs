@@ -179,6 +179,8 @@ for (const path of [
   '/icons/kroma.png', '/icons/tabungku.png', '/icons/gps-tracker.png',
   '/previews/tahun-baru-countdown-360.png', '/previews/tahun-baru-countdown-1080.png',
   '/previews/crypto-blog-360.png', '/previews/crypto-blog-1080.png',
+  '/screenshots/kroma-1.png', '/screenshots/kroma-2.png', '/screenshots/kroma-3.png',
+  '/screenshots/gps-tracker-1.png', '/screenshots/gps-tracker-2.png', '/screenshots/gps-tracker-3.png',
 ]) {
   const asset = await req(path)
   expect(asset, 200)

@@ -126,7 +126,11 @@ Setelah Raxe pilih konsep, Artisan finalize DESIGN.md + asset PNG, Forge baru la
 
 | Gate | Status | Bukti |
 |---|---|---|
-| GATE 0 | INFRA OK, KODE BELUM PUSH | Vanguard Phase 0: Pages+R2+Neon+Clerk+9 env terpasang (2026-11-23 00:36). Forge Phase 2 pivot-public selesai TSK-20261123-004556 (16 file public/ + middleware admin-only + robots/sitemap). **Tunggu: push Vanguard ke AREMON-blip/raxehub → curl /api/health** |
-| GATE 1 | PASS (lokal) | Forge: `test-api.sh` exit 0 2×, contract bendain; Oracle verify kode r2 host, test-mode fail-closed, sanitize key. Real Clerk JWT = tanggung jawab Phase 0/2 |
-| GATE 2 | PASS (lokal) | TSK-20261122-231802: bundle statik siap, audit 0 hit, F12 verbatim, mark byte-identical. A1/A6/A7 = prod (Gate 0+3) |
-| GATE 3–4 | PENDING | Phase 0 infra, Phase 3 seeding, QA |
+| GATE 0 | ✅ PASS PROD | 2026-11-23 01:21: `/api/health` 200 `{status,neon,r2,clerk:ok}` CF-RAY a5e9f3c50d42a2a7-CGK; `/` 200 anonim; `/api/apps` 200 5 row; `/api/admin` unauth 401. Commit aadbc16 |
+| GATE 1 | ✅ PASS PROD | Hotfix TSK-20261123-013807: Clerk loader resmi (PK via Worker `/config`, 0 hit pk/cdn.clerk.io), `/admin` gate DOM hidden + middleware 302, schema.sql sync 8 field, seed copy §9.5 5/5. Oracle verify all |
+| GATE 2 | ✅ PASS LOKAL (prod nunggu push) | Round 2 TSK-20261123-020352: 3 ikon + 4 preview aset wired (`iconHtml`/`previewHtml`), CTA Buka karya, audit `masuk\|login\|keluar\|tanpa login` 0, secret 0, copy lock 10/10, nav anonim 3-tab. Bundle 23 file |
+| GATE 2 QA | ✅ PASS PROD | 2026-11-23 Vanguard: A1 health 200, A2 login-text 0, A3 ikon 512 + A3b preview real, A4 kroma 302 attachment, A5 admin hidden + 401/403 fail-closed, A6 presign expired 403, A7 AAA 7.84:1, A8 scrollWidth 360. CF-RAY a5eb7047b99d0a12-CGK. Oracle re-probe: health ok, /apk 200, /admin noindex, /api/download/kroma 302, latestVersion 1.0 |
+| NEON+PUSH | ✅ DONE | Neon schema 3 table + 5 seed row live. Push Round 2 c4b1800, Round 3 85c39b5, Clerk v6 f9c9fba, 59a9851 → origin/main live. `/api/apps` 5 row type field OK |
+| GATE 3 | ✅ UPLOAD PASS | KROMA v1.0 live: R2 `apps/KROMA/KROMA-v1.0-release-1.0.apk` (15,499,843 byte), `/api/download/kroma` 302 attachment CF-RAY a5ebcf20ff83c5f0, SHA256 `5581e003…1324`, versionName 1.0 vc 155. Commit 59a9851 (Clerk v6 + R2 CORS + logo fix + Tampilan wired). Tabungku & GPS upload = berikutnya |
+| GATE 3b | ✅ LOKAL | Screen pack 9 slot (kroma, tabungku, gps-tracker ×3) wired `STATIC_SHOTS` DB prioritas. Puppeteer 360/1080 9/9 render, hash match. Microupdate Tabungku (msg 14458). **Unpushed — nunggu Vanguard Round 4** |
+| GATE 4 | ⏳ | Upload Tabungku + GPS APK → install A21s → shasum match → launch |

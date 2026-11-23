@@ -15,10 +15,11 @@
 ## 2. Upload APK rilis pertama (KROMA)
 
 1. Siapkan **signed release APK**:
-   `D:/default project/kroma/androidApp/build/outputs/apk/release/androidApp-release.apk`
-   — verified: v14.0.1, versionCode 155, 15.5 MB, APK Sig Block v2/v3 present.
+   `D:/unduhan/KROMA-v1.0-release.apk`
+   — verified: 14.7 MB (15,499,843 byte), APK Sig Block v2/v3 present,
+   nama file = label rilis `KROMA-v1.0-release`.
 2. Buka `/admin` (direct URL) → login Clerk (admin email) → pilih app **KROMA**:
-   - versionName: `14.0.1`
+   - versionName: `1.0` (rilis publik pertama)
    - versionCode: `155`
    - releaseNotes: changelog singkat (cek `kroma/` CHANGELOG bila ada)
 3. Pilih file APK → browser hash SHA-256 client-side (progress bar) →

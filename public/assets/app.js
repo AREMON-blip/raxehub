@@ -10,6 +10,11 @@ function versionLabel(app) {
 
 const ICON_SLUGS = new Set(['kroma', 'tabungku', 'gps-tracker'])
 const PREVIEW_SLUGS = new Set(['tahun-baru-countdown', 'crypto-blog'])
+const STATIC_SHOTS = {
+  kroma: [1, 2, 3].map((n) => ({ src: `/screenshots/kroma-${n}.png`, caption: `Tampilan ${n}` })),
+  tabungku: [1, 2, 3].map((n) => ({ src: `/screenshots/tabungku-${n}.png`, caption: `Tampilan ${n}` })),
+  'gps-tracker': [1, 2, 3].map((n) => ({ src: `/screenshots/gps-tracker-${n}.png`, caption: `Tampilan ${n}` })),
+}
 
 function iconHtml(app, large = false) {
   const cls = `tile-icon${large ? ' detail-icon' : ''}`
@@ -142,14 +147,18 @@ function webDetail(app) {
     </div>`
 }
 
+function shotHtml(shot, app) {
+  if (!shot.src) return `<div class="shot"><span>${esc(shot.caption || 'Tampilan')}</span></div>`
+  return `<figure class="shot" style="padding:0;overflow:hidden;position:relative;margin:0"><img src="${esc(shot.src)}" alt="${esc(shot.caption || app.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">${shot.caption ? `<figcaption style="position:absolute;inset:auto 0 0 0;padding:8px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.78));color:#EDEDED">${esc(shot.caption)}</figcaption>` : ''}</figure>`
+}
+
 function apkDetail(app, detail) {
   const versions = detail?.versions || []
-  const screenshots = detail?.screenshots || []
+  const dbShots = (detail?.screenshots || []).map((shot) => ({ src: shot.url, caption: shot.caption }))
+  const screenshots = [...dbShots, ...(STATIC_SHOTS[app.slug] || [])]
   const latest = versions[0] || null
   const shots = screenshots.length
-    ? screenshots.map((shot) => shot.url
-        ? `<figure class="shot" style="padding:0;overflow:hidden;position:relative;margin:0"><img src="${esc(shot.url)}" alt="${esc(shot.caption || app.name)}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block">${shot.caption ? `<figcaption style="position:absolute;inset:auto 0 0 0;padding:8px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.78));color:#EDEDED">${esc(shot.caption)}</figcaption>` : ''}</figure>`
-        : `<div class="shot"><span>${esc(shot.caption || 'Tampilan')}</span></div>`).join('')
+    ? screenshots.map((shot) => shotHtml(shot, app)).join('')
     : '<div class="shot"><span>Belum ada screenshot</span></div>'
   const changelog = versions.length
     ? versions.map((item) => `<div class="version-row">
