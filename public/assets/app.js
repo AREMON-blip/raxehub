@@ -184,8 +184,8 @@ function apkDetail(app, detail) {
       </div>
       <aside class="stack">
         <div class="field"${versions.length ? '' : ' style="display:none"'}><label class="label" for="version-select">Versi</label>
-          <select id="version-select"><option value="">Terbaru</option>
-            ${versions.map((item) => `<option value="${esc(item.id)}">v${esc(item.version_name)}</option>`).join('')}
+          <select id="version-select">
+            ${versions.map((item, idx) => `<option value="${idx === 0 ? '' : esc(item.id)}" data-sha="${esc(item.sha256)}" data-ver="${esc(item.version_name)}">v${esc(item.version_name)}${idx === 0 ? ' (Terbaru)' : ''}</option>`).join('')}
           </select>
         </div>
         <div class="btn-row">${latest ? downloadControl(app.slug) : '<button class="btn btn-primary" disabled type="button">Belum ada rilis</button>'}</div>
@@ -240,8 +240,13 @@ async function bootDetail() {
   wireCopy()
   const select = document.getElementById('version-select')
   select?.addEventListener('change', () => {
+    const opt = select.selectedOptions[0]
     const link = mount.querySelector('.btn-primary[href^="/api/download/"]')
     if (link) link.href = `/api/download/${encodeURIComponent(slug)}${select.value ? `/${encodeURIComponent(select.value)}` : ''}`
+    const shaVal = mount.querySelector('.sha-value')
+    if (shaVal && opt?.dataset.sha) shaVal.textContent = opt.dataset.sha
+    const copyBtn = mount.querySelector('[data-copy]')
+    if (copyBtn && opt?.dataset.sha) copyBtn.dataset.copy = opt.dataset.sha
   })
 }
 

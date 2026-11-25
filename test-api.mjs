@@ -32,7 +32,7 @@ function expect(result, status, code) {
 }
 
 let ready = false
-for (let attempt = 0; attempt < 80; attempt += 1) {
+for (let attempt = 0; attempt < 180; attempt += 1) {
   try {
     if ((await req('/api/health')).status === 200) {
       ready = true

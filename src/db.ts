@@ -114,7 +114,7 @@ export async function listApps(env: Env): Promise<AppSummary[]> {
            v.version_name AS "versionName", v.version_code AS "versionCode", v.size_bytes AS "sizeBytes"
     FROM apps a
     LEFT JOIN versions v ON v.id = (
-      SELECT id FROM versions WHERE app_id = a.id AND active = true ORDER BY created_at DESC LIMIT 1
+      SELECT id FROM versions WHERE app_id = a.id AND active = true ORDER BY active DESC, version_code DESC, created_at DESC LIMIT 1
     )
     ORDER BY a.sort ASC, a.name ASC
   `) as unknown as Row[]
@@ -159,7 +159,7 @@ export async function getAppDetail(
       app,
       versions: store.versions
         .filter((version) => version.app_id === app.id)
-        .sort((a, b) => b.created_at.localeCompare(a.created_at)),
+        .sort((a, b) => Number(b.active) - Number(a.active) || b.version_code - a.version_code || b.created_at.localeCompare(a.created_at)),
       screenshots: store.screenshots
         .filter((shot) => shot.app_id === app.id)
         .sort((a, b) => a.sort - b.sort),
@@ -173,7 +173,7 @@ export async function getAppDetail(
   if (!app) return null
 
   const versions = (await sql`
-    SELECT * FROM versions WHERE app_id = ${app.id} ORDER BY created_at DESC
+    SELECT * FROM versions WHERE app_id = ${app.id} ORDER BY active DESC, version_code DESC, created_at DESC
   `) as unknown as VersionRow[]
   const screenshots = (await sql`
     SELECT * FROM screenshots WHERE app_id = ${app.id} ORDER BY sort ASC
@@ -206,7 +206,7 @@ export async function getDownloadTarget(
     WHERE a.slug = ${slug}
       AND (${versionId ?? null}::text IS NULL OR v.id::text = ${versionId ?? null}::text)
       AND (${versionId ?? null}::text IS NOT NULL OR v.active = true)
-    ORDER BY v.created_at DESC
+    ORDER BY v.active DESC, v.version_code DESC, v.created_at DESC
     LIMIT 1
   `) as unknown as Array<{ apkKey: string; versionName: string }>
 
