@@ -16,9 +16,21 @@ export const onRequest = route(async ({ env, params, request }) => {
     }
     patch.status = status as AppRow['status']
   }
+  if (body.type !== undefined) {
+    const type = str(body.type, 'type')
+    if (type !== 'apk' && type !== 'web') throw new ApiError(400, 'E-BODY', 'type must be apk or web')
+    patch.type = type as 'apk' | 'web'
+  }
+  const liveUrl = body.live_url ?? body.liveUrl
+  if (liveUrl !== undefined) patch.live_url = optionalStr(liveUrl, 'live_url')
+  const repoUrl = body.repo_url ?? body.repoUrl
+  if (repoUrl !== undefined) patch.repo_url = optionalStr(repoUrl, 'repo_url')
+  if (body.stack !== undefined) patch.stack = optionalStr(body.stack, 'stack')
   if (body.sort !== undefined) patch.sort = num(body.sort, 'sort')
   const iconKey = body.icon_key ?? body.iconKey
   if (iconKey !== undefined) patch.icon_key = optionalStr(iconKey, 'icon_key')
+  const previewKey = body.preview_key ?? body.previewKey
+  if (previewKey !== undefined) patch.preview_key = optionalStr(previewKey, 'preview_key')
 
   const app = await updateApp(env, params.id ?? '', patch)
   if (!app) throw new ApiError(404, 'E-NOTFOUND', 'app not found')

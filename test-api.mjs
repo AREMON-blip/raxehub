@@ -227,6 +227,37 @@ assert.equal(union.find((app) => app.slug === 'new-app').icon_key, 'icons/new-ap
 assert.equal(union.find((app) => app.slug === 'gps-tracker').name, 'GPS Tracker')
 assert.deepEqual(mergeCatalog(APK_SEED, []).map((app) => app.slug), APK_SEED.map((app) => app.slug))
 
+const createdWeb = await req('/api/admin/apps', {
+  headers: ADMIN,
+  method: 'POST',
+  body: {
+    slug: 'demo-web',
+    name: 'Demo Web',
+    tagline: 'Web baru dari admin',
+    description: 'Testing web creation from admin',
+    type: 'web',
+    live_url: 'https://example.com',
+    stack: 'Next.js, Vercel',
+    sort: 30,
+  },
+})
+expect(createdWeb, 201)
+assert.equal(createdWeb.data.app.type, 'web')
+assert.equal(createdWeb.data.app.live_url, 'https://example.com')
+
+const presignPreview = await req('/api/admin/presign-preview', {
+  headers: ADMIN,
+  method: 'POST',
+  body: { slug: 'demo-web', sizeBytes: 12345 },
+})
+expect(presignPreview, 200)
+assert.equal(presignPreview.data.key, 'previews/demo-web.png')
+
+const previewRedirect = await req('/api/preview/demo-web')
+expect(previewRedirect, 302)
+assert.match(new URL(previewRedirect.headers.get('location')).pathname, /\/previews\/demo-web\.png$/)
+expect(await req('/api/preview/does-not-exist'), 404, 'E-NOTFOUND')
+
 for (const path of [
   '/icons/kroma.png', '/icons/tabungku.png', '/icons/gps-tracker.png',
   '/previews/tahun-baru-countdown-360.png', '/previews/tahun-baru-countdown-1080.png',

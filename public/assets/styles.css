@@ -1,3 +1,8 @@
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration: 220ms; }
+}
+
 :root {
   color-scheme: dark;
   --bg: #141415;
@@ -172,8 +177,46 @@ h1, h2, h3, p { margin: 0; }
 .ghost-b { justify-self: end; }
 .scroll-progress {
   position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
-  background: var(--text); opacity: 0.65; transform-origin: left center;
+  background: var(--text); opacity: 0.65; transform-origin: 0 50%;
   transform: scaleX(0); pointer-events: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    @keyframes raxehub-scroll-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    .scroll-progress {
+      animation: raxehub-scroll-progress auto linear;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+/* kinetic moving APK shelf on Home: static grid by default, opt-in to motion */
+.shelf-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.marquee { overflow: visible; position: relative; padding-block: 8px; }
+.marquee-track { display: block; }
+.marquee-group { display: grid; gap: var(--gap); }
+.marquee-clone { display: none; }
+@media (min-width: 680px) { .marquee-group { grid-template-columns: repeat(3, 1fr); } }
+@media (prefers-reduced-motion: no-preference) {
+  .marquee {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+  }
+  .marquee-track {
+    display: flex; width: max-content; gap: var(--gap);
+    animation: raxehub-marquee 26s linear infinite; will-change: transform;
+  }
+  .marquee-group { display: flex; gap: var(--gap); }
+  .marquee-clone { display: flex; }
+  .marquee .tile { flex: 0 0 272px; width: 272px; }
+  @media (min-width: 680px) { .marquee .tile { flex: 0 0 320px; width: 320px; } }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track,
+  .marquee.is-paused .marquee-track { animation-play-state: paused; }
+  @keyframes raxehub-marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(calc(-50% - (var(--gap) / 2)), 0, 0); }
+  }
 }
 .char-mask { display: inline-block; overflow: hidden; vertical-align: bottom; }
 .char-in { display: inline-block; will-change: transform; }
@@ -276,15 +319,10 @@ textarea { min-height: 96px; resize: vertical; }
 .reject .tile-icon { width: 56px; height: 56px; }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-property: color, background-color, border-color, opacity !important;
-    transition-duration: 200ms !important;
-    transform: none !important;
-  }
+  .card:hover { transform: none; }
+  .btn:active { transform: none; }
   .mark-in { opacity: 0; transform: none; }
   .mark-in.is-in { opacity: 1; transform: none; }
-  .mark-in svg > g { opacity: 1; transform: none; transition: none !important; }
-  .plate, .hero-ghost, .scroll-progress { display: none; }
+  .mark-in svg > g { opacity: 1; transform: none; transition: none; }
+  .plate, .hero-ghost, .scroll-progress, #marquee-toggle { display: none; }
 }

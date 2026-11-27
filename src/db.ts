@@ -63,11 +63,13 @@ function db(env: Env) {
 
 let schemaReady: Promise<void> | null = null
 
-// Idempotent runtime migration so prod Neon gains icon_key without a manual SQL step.
+// Idempotent runtime migration so prod Neon gains icon_key/preview_key without a manual SQL step.
 async function ensureSchema(env: Env): Promise<void> {
   if (isLocalTest(env)) return
   schemaReady ??= (async () => {
-    await db(env)`ALTER TABLE apps ADD COLUMN IF NOT EXISTS icon_key text`
+    const sql = db(env)
+    await sql`ALTER TABLE apps ADD COLUMN IF NOT EXISTS icon_key text`
+    await sql`ALTER TABLE apps ADD COLUMN IF NOT EXISTS preview_key text`
   })().catch((error) => {
     schemaReady = null
     throw error
@@ -110,7 +112,7 @@ export async function listApps(env: Env): Promise<AppSummary[]> {
   await ensureSchema(env)
   const rows = (await db(env)`
     SELECT a.id, a.slug, a.name, a.tagline, a.description, a.status,
-           a.type, a.live_url, a.repo_url, a.stack, a.icon_key, a.sort, a.created_at,
+           a.type, a.live_url, a.repo_url, a.stack, a.icon_key, a.preview_key, a.sort, a.created_at,
            v.version_name AS "versionName", v.version_code AS "versionCode", v.size_bytes AS "sizeBytes"
     FROM apps a
     LEFT JOIN versions v ON v.id = (
@@ -130,6 +132,7 @@ export async function listApps(env: Env): Promise<AppSummary[]> {
     live_url: row.live_url,
     repo_url: row.repo_url,
     icon_key: row.icon_key ?? null,
+    preview_key: row.preview_key ?? null,
     stack: Array.isArray(row.stack)
       ? row.stack
       : row.stack
@@ -229,14 +232,35 @@ export async function getIconTarget(
   return row ? { slug: row.slug, iconKey: row.iconKey || `icons/${row.slug}.png` } : null
 }
 
+export async function getPreviewTarget(
+  env: Env,
+  slug: string,
+): Promise<{ slug: string; previewKey: string } | null> {
+  if (isLocalTest(env)) {
+    const app = store.apps.find((item) => item.slug === slug)
+    return app ? { slug: app.slug, previewKey: app.preview_key || `previews/${app.slug}.png` } : null
+  }
+  await ensureSchema(env)
+  const rows = (await db(env)`
+    SELECT slug, preview_key AS "previewKey" FROM apps WHERE slug = ${slug} LIMIT 1
+  `) as unknown as Array<{ slug: string; previewKey: string | null }>
+  const row = rows[0]
+  return row ? { slug: row.slug, previewKey: row.previewKey || `previews/${row.slug}.png` } : null
+}
+
 export interface NewApp {
   slug: string
   name: string
   tagline: string | null
   description: string | null
   status: AppRow['status']
+  type?: 'apk' | 'web'
+  live_url?: string | null
+  repo_url?: string | null
+  stack?: string | null
   sort: number
   icon_key?: string | null
+  preview_key?: string | null
 }
 
 export async function insertApp(env: Env, input: NewApp): Promise<AppRow> {
@@ -247,6 +271,7 @@ export async function insertApp(env: Env, input: NewApp): Promise<AppRow> {
     const app: AppRow = {
       id: crypto.randomUUID(),
       ...input,
+      type: input.type ?? 'apk',
       created_at: FIXED_TIME,
     }
     store.apps.push(app)
@@ -255,8 +280,12 @@ export async function insertApp(env: Env, input: NewApp): Promise<AppRow> {
 
   await ensureSchema(env)
   const rows = (await db(env)`
-    INSERT INTO apps (slug, name, tagline, description, status, sort, icon_key)
-    VALUES (${input.slug}, ${input.name}, ${input.tagline}, ${input.description}, ${input.status}, ${input.sort}, ${input.icon_key ?? null})
+    INSERT INTO apps (slug, name, tagline, description, status, type, live_url, repo_url, stack, sort, icon_key, preview_key)
+    VALUES (
+      ${input.slug}, ${input.name}, ${input.tagline}, ${input.description}, ${input.status},
+      ${input.type ?? 'apk'}, ${input.live_url ?? null}, ${input.repo_url ?? null}, ${input.stack ?? null},
+      ${input.sort}, ${input.icon_key ?? null}, ${input.preview_key ?? null}
+    )
     RETURNING *
   `) as unknown as AppRow[]
   return rows[0]
@@ -350,8 +379,13 @@ export interface AppPatch {
   tagline?: string | null
   description?: string | null
   status?: AppRow['status']
+  type?: 'apk' | 'web'
+  live_url?: string | null
+  repo_url?: string | null
+  stack?: string | null
   sort?: number
   icon_key?: string | null
+  preview_key?: string | null
 }
 
 export async function updateApp(env: Env, id: string, patch: AppPatch): Promise<AppRow | null> {
@@ -369,8 +403,13 @@ export async function updateApp(env: Env, id: string, patch: AppPatch): Promise<
       tagline = COALESCE(${patch.tagline ?? null}, tagline),
       description = COALESCE(${patch.description ?? null}, description),
       status = COALESCE(${patch.status ?? null}, status),
+      type = COALESCE(${patch.type ?? null}, type),
+      live_url = COALESCE(${patch.live_url ?? null}, live_url),
+      repo_url = COALESCE(${patch.repo_url ?? null}, repo_url),
+      stack = COALESCE(${patch.stack ?? null}, stack),
       sort = COALESCE(${patch.sort ?? null}, sort),
-      icon_key = COALESCE(${patch.icon_key ?? null}, icon_key)
+      icon_key = COALESCE(${patch.icon_key ?? null}, icon_key),
+      preview_key = COALESCE(${patch.preview_key ?? null}, preview_key)
     WHERE id = ${id}
     RETURNING *
   `) as unknown as AppRow[]

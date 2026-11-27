@@ -33,6 +33,7 @@ export interface AppRow {
   repo_url?: string | null
   stack?: string[] | string | null
   icon_key?: string | null
+  preview_key?: string | null
   sort: number
   created_at: string
 }

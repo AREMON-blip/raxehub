@@ -7,6 +7,7 @@ export const PRESIGN_TTL = 900
 export const ICON_PRESIGN_TTL = 3600
 export const MAX_UPLOAD_BYTES = 80 * 1024 * 1024
 export const MAX_ICON_BYTES = 2 * 1024 * 1024
+export const MAX_PREVIEW_BYTES = 4 * 1024 * 1024
 
 export function sanitize(part: string): string {
   return part.replace(/[^a-zA-Z0-9._-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120) || 'file'

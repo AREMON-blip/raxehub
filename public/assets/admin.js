@@ -3,6 +3,7 @@ import { sha256File } from './sha256.js'
 
 const MAX_UPLOAD_BYTES = 80 * 1024 * 1024
 const MAX_ICON_BYTES = 2 * 1024 * 1024
+const MAX_PREVIEW_BYTES = 4 * 1024 * 1024
 const $ = (selector) => document.querySelector(selector)
 const status = (message) => { $('[data-status]').textContent = message }
 const progress = (selector, ratio) => { $(selector).style.width = `${Math.round(ratio * 100)}%` }
@@ -168,6 +169,84 @@ async function bootAdmin(identity) {
       submit.disabled = false
     }
   })
+
+  const webForm = document.getElementById('web-form')
+  const webStatus = (msg) => { const el = $('[data-web-status]'); if (el) el.textContent = msg }
+  if (webForm) {
+    const webSubmit = webForm.querySelector('button[type="submit"]')
+    const applyWeb = (webs) => {
+      const chosen = webs.find((w) => w.slug === webForm.webSelect.value)
+      webForm.slug.readOnly = !!chosen
+      webForm.slug.value = chosen?.slug || ''
+      webForm.name.value = chosen?.name || ''
+      webForm.tagline.value = chosen?.tagline || ''
+      webForm.description.value = chosen?.description || ''
+      webForm.liveUrl.value = chosen?.live_url || ''
+      webForm.repoUrl.value = chosen?.repo_url || ''
+      webForm.stack.value = Array.isArray(chosen?.stack) ? chosen.stack.join(', ') : (chosen?.stack || '')
+      webForm.sort.value = chosen?.sort ?? 30
+    }
+    const refreshWebs = async (selected = NEW_APP) => {
+      const webs = await listApps(identity, 'web')
+      webForm.webSelect.innerHTML = `<option value="${NEW_APP}">+ Web baru</option>${webs
+        .map((w) => `<option value="${esc(w.slug)}">${esc(w.name)} (${esc(w.slug)})</option>`)
+        .join('')}`
+      webForm.webSelect.value = webs.some((w) => w.slug === selected) ? selected : NEW_APP
+      applyWeb(webs)
+      return webs
+    }
+    let webCache = await refreshWebs()
+    webForm.webSelect.addEventListener('change', () => applyWeb(webCache))
+    webForm.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      webStatus('')
+      const slug = cleanSlug(webForm.slug.value)
+      if (!slug) return webStatus('Slug web tidak valid.')
+      const previewFile = webForm.preview.files[0]
+      if (previewFile && (previewFile.size === 0 || previewFile.size > MAX_PREVIEW_BYTES)) {
+        return webStatus('Ukuran preview maksimal 4 MB.')
+      }
+      webSubmit.disabled = true
+      try {
+        let previewKey = null
+        if (previewFile) {
+          webStatus('Meminta presign preview…')
+          const signed = await api('/api/admin/presign-preview', {
+            identity, method: 'POST', body: { slug, sizeBytes: previewFile.size },
+          })
+          webStatus('Mengunggah preview ke R2…')
+          await putFile(signed.uploadUrl, previewFile, () => {})
+          previewKey = signed.key
+        }
+        webStatus('Menyimpan karya web…')
+        const payload = {
+          name: webForm.name.value.trim(),
+          tagline: webForm.tagline.value.trim() || null,
+          description: webForm.description.value.trim() || null,
+          status: 'released',
+          type: 'web',
+          live_url: webForm.liveUrl.value.trim() || null,
+          repo_url: webForm.repoUrl.value.trim() || null,
+          stack: webForm.stack.value.trim() || null,
+          sort: Number(webForm.sort.value) || 0,
+          ...(previewKey ? { preview_key: previewKey } : {}),
+        }
+        const existing = webCache.find((w) => w.slug === slug)
+        if (existing) {
+          await api(`/api/admin/apps/${encodeURIComponent(existing.id)}`, { identity, method: 'PATCH', body: payload })
+        } else {
+          await api('/api/admin/apps', { identity, method: 'POST', body: { slug, ...payload } })
+        }
+        webStatus(`Karya web tersimpan: ${slug}`)
+        $('#web-result').innerHTML = '<a class="btn btn-secondary" href="/web" style="margin-top:8px">Lihat di Galeri Web</a>'
+        webCache = await refreshWebs(slug)
+      } catch (error) {
+        webStatus(error.message || 'Gagal menyimpan karya web.')
+      } finally {
+        webSubmit.disabled = false
+      }
+    })
+  }
 
   const shotForm = document.getElementById('shot-form')
   const shotStatus = (msg) => { const el = $('[data-shot-status]'); if (el) el.textContent = msg }

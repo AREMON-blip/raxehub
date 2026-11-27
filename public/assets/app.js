@@ -1,6 +1,6 @@
 import {
   APK_SEED, WEB_SEED, ApiFailure, PK, api, copyButton, esc,
-  formatBytes, initLandingMotion, listApps, mergeCatalog, renderChrome, skeletonCards,
+  formatBytes, initCatalogMotion, initLandingMotion, listApps, mergeCatalog, renderChrome, skeletonCards,
   wireCards, wireCopy,
 } from './shared.js'
 
@@ -32,8 +32,15 @@ function iconHtml(app, large = false) {
 }
 
 function previewHtml(app) {
-  if (!PREVIEW_SLUGS.has(app.slug)) return `WEB / ${esc(app.name.slice(0, 2).toUpperCase())}`
-  const file = `/previews/${encodeURIComponent(app.slug)}`
+  const slug = encodeURIComponent(app.slug)
+  const fallbackLabel = `WEB / ${esc(app.name.slice(0, 2).toUpperCase())}`
+  if (app.preview_key) {
+    return `<img src="/api/preview/${slug}" alt="Pratinjau ${esc(app.name)}" loading="lazy"
+      onerror="this.parentNode.textContent='${fallbackLabel}'"
+      style="display:block;width:100%;height:100%;object-fit:cover">`
+  }
+  if (!PREVIEW_SLUGS.has(app.slug)) return fallbackLabel
+  const file = `/previews/${slug}`
   return `<picture style="display:block;width:100%;height:100%">
     <source media="(min-width:680px)" srcset="${file}-1080.png">
     <img src="${file}-360.png" alt="Pratinjau ${esc(app.name)}" loading="lazy"
@@ -76,7 +83,17 @@ async function bootHome() {
   const apps = await loadCatalog('apk', APK_SEED)
   const rilisTitle = document.getElementById('rilis-title')
   if (rilisTitle) rilisTitle.textContent = `${apps.length} di rak`
-  mount.innerHTML = apps.map((app, index) => tileHtml(app, index === 0)).join('')
+  const cardsHtml = apps.map((app, index) => tileHtml(app, index === 0)).join('')
+  mount.className = 'marquee'
+  mount.innerHTML = `<div class="marquee-track">
+    <div class="marquee-group">${cardsHtml}</div>
+    <div class="marquee-group marquee-clone" aria-hidden="true">${cardsHtml}</div>
+  </div>`
+  const toggleBtn = document.getElementById('marquee-toggle')
+  toggleBtn?.addEventListener('click', () => {
+    const paused = mount.classList.toggle('is-paused')
+    toggleBtn.textContent = paused ? 'Putar' : 'Jeda'
+  })
   const webMount = document.getElementById('home-web')
   if (webMount) {
     webMount.innerHTML = skeletonCards(2)
@@ -100,6 +117,7 @@ async function bootApk() {
   mount.innerHTML = `<div class="tiles">${apps.map((app, index) => tileHtml(app, index === 0)).join('')}</div>
     <div class="status-line" data-status style="margin-top:16px"></div>`
   wireCards()
+  initCatalogMotion()
 }
 
 function webCard(app) {
@@ -134,6 +152,7 @@ async function bootWeb() {
   const apps = await loadCatalog('web', WEB_SEED)
   mount.innerHTML = `<div class="web-grid">${apps.map(webCard).join('')}</div>`
   wireCards()
+  initCatalogMotion()
 }
 
 function seedFor(slug) {

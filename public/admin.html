@@ -55,6 +55,30 @@
         <div><button class="btn btn-primary" type="submit">Unggah rilis</button></div>
       </form>
 
+      <form id="web-form" class="card" style="margin-top:24px;display:grid;gap:20px">
+        <div>
+          <span class="label">ADMIN / WEB</span>
+          <h2 class="h2" style="margin-top:8px">Tambah / Edit Karya Web</h2>
+        </div>
+        <div class="form-grid">
+          <div class="field" style="grid-column:1/-1"><label class="label" for="w-app-select">Karya Web</label>
+            <select id="w-app-select" name="webSelect"><option value="__new__">+ Web baru</option></select>
+          </div>
+          <div class="field"><label class="label" for="w-slug">Slug</label><input id="w-slug" name="slug" required placeholder="portfolio-2026"></div>
+          <div class="field"><label class="label" for="w-name">Nama</label><input id="w-name" name="name" required placeholder="Portfolio 2026"></div>
+          <div class="field"><label class="label" for="w-tagline">Tagline</label><input id="w-tagline" name="tagline" placeholder="Deskripsi singkat 1 baris"></div>
+          <div class="field"><label class="label" for="w-sort">Urutan</label><input id="w-sort" name="sort" type="number" value="30"></div>
+          <div class="field" style="grid-column:1/-1"><label class="label" for="w-desc">Deskripsi</label><textarea id="w-desc" name="description" placeholder="Deskripsi 2–3 baris"></textarea></div>
+          <div class="field"><label class="label" for="w-live">URL Live</label><input id="w-live" name="liveUrl" type="url" required placeholder="https://example.vercel.app"></div>
+          <div class="field"><label class="label" for="w-repo">URL Source / Repo (opsional)</label><input id="w-repo" name="repoUrl" type="url" placeholder="https://github.com/..."></div>
+          <div class="field"><label class="label" for="w-stack">Stack (pisah koma)</label><input id="w-stack" name="stack" placeholder="Next.js, Tailwind, Vercel"></div>
+          <div class="field"><label class="label" for="w-preview">Preview Gambar (opsional, maks. 4 MB)</label><input id="w-preview" name="preview" type="file" accept="image/png,image/jpeg,image/webp"></div>
+        </div>
+        <p class="status-line" data-web-status aria-live="polite"></p>
+        <div id="web-result"></div>
+        <div><button class="btn btn-primary" type="submit">Simpan karya web</button></div>
+      </form>
+
       <form id="shot-form" class="card" style="margin-top:24px;display:grid;gap:20px">
         <div>
           <span class="label">ADMIN / TAMPILAN</span>

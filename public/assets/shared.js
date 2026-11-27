@@ -208,6 +208,7 @@ export function mergeCatalog(seed, live) {
       tagline: row.tagline || base.tagline || '',
       description: row.description || base.description || '',
       icon_key: row.icon_key || null,
+      preview_key: row.preview_key || null,
       live_url: row.live_url || base.live_url || '',
       repo_url: row.repo_url ?? base.repo_url ?? '',
       stack: Array.isArray(row.stack) && row.stack.length ? row.stack : base.stack || [],
@@ -304,11 +305,14 @@ export async function initLandingMotion() {
     y: 14, duration: 0.42, stagger: 0.06,
   }, '-=0.34')
 
-  // Scroll progress hairline under navbar.
-  gsap.to('.scroll-progress', {
-    scaleX: 1, ease: 'none',
-    scrollTrigger: { trigger: document.documentElement, start: 'top top', end: 'bottom bottom', scrub: true },
-  })
+  // Scroll progress hairline: native CSS scroll-driven animation runs on the compositor;
+  // only attach GSAP fallback in browsers without animation-timeline: scroll().
+  if (!CSS.supports('animation-timeline', 'scroll()')) {
+    gsap.to('.scroll-progress', {
+      scaleX: 1, ease: 'none',
+      scrollTrigger: { trigger: document.documentElement, start: 'top top', end: 'bottom bottom', scrub: true },
+    })
+  }
 
   // Kinetic scrubbed parallax on hero mark, plates, and ghost typography.
   gsap.to('.hero-mark-host', {
@@ -359,6 +363,53 @@ export async function initLandingMotion() {
     })
   }
   window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true })
+}
+
+export async function initCatalogMotion() {
+  if (isReduced()) return
+  try {
+    await Promise.all([
+      loadScript('https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js'),
+    ])
+  } catch { return }
+
+  const { gsap, ScrollTrigger, Lenis } = window
+  gsap.registerPlugin(ScrollTrigger)
+  const lenis = new Lenis({ lerp: 0.12 })
+  lenis.on('scroll', ScrollTrigger.update)
+  gsap.ticker.add((time) => lenis.raf(time * 1000))
+  gsap.ticker.lagSmoothing(0)
+
+  const title = document.querySelector('main h1.h1')
+  if (title && !title.dataset.split) {
+    const raw = title.textContent || ''
+    title.setAttribute('aria-label', raw)
+    title.dataset.split = '1'
+    title.innerHTML = [...raw]
+      .map((ch) => `<span class="char-mask" aria-hidden="true"><span class="char-in">${ch === ' ' ? '&nbsp;' : esc(ch)}</span></span>`)
+      .join('')
+    gsap.from('main h1.h1 .char-in', { yPercent: 110, duration: 0.48, stagger: 0.03, ease: 'power4.out' })
+  }
+  if (document.querySelector('main .lead')) {
+    gsap.from('main .lead', { y: 12, duration: 0.4, delay: 0.12, ease: 'power3.out' })
+  }
+  ScrollTrigger.batch('#catalog .tile, #catalog .web-card', {
+    start: 'top 94%',
+    once: true,
+    onEnter: (batch) => {
+      gsap.fromTo(batch, { y: 20, scale: 0.98 }, {
+        y: 0, scale: 1, duration: 0.42, stagger: 0.06, ease: 'power3.out', overwrite: 'auto',
+      })
+    },
+  })
+  if (document.querySelectorAll('#catalog .web-thumb').length) {
+    gsap.from('#catalog .web-thumb', {
+      clipPath: 'inset(8% 0% 8% 0%)', duration: 0.5, stagger: 0.08, ease: 'power3.out',
+      scrollTrigger: { trigger: '#catalog', start: 'top 92%', once: true },
+    })
+  }
 }
 
 export function copyButton(text) {
