@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://raxehub.pages.dev/</loc></url>
-  <url><loc>https://raxehub.pages.dev/apk</loc></url>
-  <url><loc>https://raxehub.pages.dev/web</loc></url>
-  <url><loc>https://raxehub.pages.dev/app/gps-tracker</loc></url>
+  <url><loc>https://raxe.web.id/</loc></url>
+  <url><loc>https://raxe.web.id/apk</loc></url>
+  <url><loc>https://raxe.web.id/web</loc></url>
+  <url><loc>https://raxe.web.id/app/kroma</loc></url>
+  <url><loc>https://raxe.web.id/app/tabungku</loc></url>
+  <url><loc>https://raxe.web.id/app/gps-tracker</loc></url>
+  <url><loc>https://raxe.web.id/app/9router-mobile</loc></url>
 </urlset>

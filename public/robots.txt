@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://raxehub.pages.dev/sitemap.xml
+Sitemap: https://raxe.web.id/sitemap.xml
