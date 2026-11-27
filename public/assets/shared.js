@@ -161,7 +161,7 @@ export function renderChrome(active, footerCopy, { showSignOut = false } = {}) {
     nav.innerHTML = `<nav class="nav" aria-label="Utama"><div class="nav-inner wrap"><span class="nav-word">RaxeHub</span><div class="nav-grid">
       ${tabs.map(([key, href, label]) => `<a class="nav-link" href="${href}"${key === active ? ' aria-current="page"' : ''}>${label}</a>`).join('')}
       ${showSignOut ? '<button class="nav-link nav-signout" id="signout" type="button">Keluar</button>' : ''}
-    </div></div></nav>`
+    </div></div><div class="scroll-progress" aria-hidden="true"></div></nav>`
     document.getElementById('signout')?.addEventListener('click', () => { signOut() })
   }
   const foot = document.getElementById('footer-mount')
@@ -235,12 +235,19 @@ export function wireCards() {
     })
     node.addEventListener('pointerleave', () => { node.style.transform = '' })
   })
+  document.querySelectorAll('.card').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect()
+      card.style.setProperty('--mx', `${(((event.clientX - rect.left) / rect.width) * 100).toFixed(1)}%`)
+      card.style.setProperty('--my', `${(((event.clientY - rect.top) / rect.height) * 100).toFixed(1)}%`)
+    })
+  })
   document.querySelectorAll('[data-tilt]').forEach((card) => {
     card.addEventListener('pointermove', (event) => {
       const rect = card.getBoundingClientRect()
       const x = (event.clientX - rect.left) / rect.width - 0.5
       const y = (event.clientY - rect.top) / rect.height - 0.5
-      card.style.transform = `rotateX(${(-y * 12).toFixed(2)}deg) rotateY(${(x * 12).toFixed(2)}deg) translateY(-4px)`
+      card.style.transform = `rotateX(${(-y * 10).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg) translateY(-4px)`
     })
     card.addEventListener('pointerleave', () => { card.style.transform = '' })
   })
@@ -272,36 +279,83 @@ export async function initLandingMotion() {
 
   const { gsap, ScrollTrigger, Lenis } = window
   gsap.registerPlugin(ScrollTrigger)
-  const lenis = new Lenis({ lerp: 0.1 })
+  const lenis = new Lenis({ lerp: 0.12 })
   lenis.on('scroll', ScrollTrigger.update)
   gsap.ticker.add((time) => lenis.raf(time * 1000))
   gsap.ticker.lagSmoothing(0)
 
+  // Editorial split-character mask reveal on hero word (keeps aria-label intact).
+  const heroWord = document.querySelector('.hero-word')
+  if (heroWord && !heroWord.dataset.split) {
+    const raw = heroWord.textContent || ''
+    heroWord.setAttribute('aria-label', raw)
+    heroWord.dataset.split = '1'
+    heroWord.innerHTML = [...raw]
+      .map((ch) => `<span class="char-mask" aria-hidden="true"><span class="char-in">${ch === ' ' ? '&nbsp;' : esc(ch)}</span></span>`)
+      .join('')
+  }
+
   mark?.classList.add('is-in')
+  const intro = gsap.timeline({ defaults: { ease: 'power4.out' } })
+  if (document.querySelectorAll('.hero-word .char-in').length) {
+    intro.from('.hero-word .char-in', { yPercent: 110, duration: 0.52, stagger: 0.035 })
+  }
+  intro.from('.hero-type .label, .hero-tagline, .hero-type .btn-row', {
+    y: 14, duration: 0.42, stagger: 0.06,
+  }, '-=0.34')
+
+  // Scroll progress hairline under navbar.
+  gsap.to('.scroll-progress', {
+    scaleX: 1, ease: 'none',
+    scrollTrigger: { trigger: document.documentElement, start: 'top top', end: 'bottom bottom', scrub: true },
+  })
+
+  // Kinetic scrubbed parallax on hero mark, plates, and ghost typography.
   gsap.to('.hero-mark-host', {
-    yPercent: 12, ease: 'none',
+    yPercent: 10, ease: 'none',
     scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
   })
   gsap.to('.plate-a', {
-    yPercent: 20, ease: 'none',
+    yPercent: 18, ease: 'none',
     scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
   })
   gsap.to('.plate-b', {
-    yPercent: -20, ease: 'none',
+    yPercent: -18, ease: 'none',
     scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
   })
-  const groups = document.querySelectorAll('.tiles [data-reveal]')
-  if (groups.length) {
-    gsap.from(groups, {
-      y: 16, duration: 0.5, ease: 'power3.out', stagger: 0.08,
-      scrollTrigger: { trigger: '.tiles', start: 'top 85%', toggleActions: 'play none none none' },
+  gsap.to('.ghost-a', {
+    xPercent: -12, ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 },
+  })
+  gsap.to('.ghost-b', {
+    xPercent: 12, ease: 'none',
+    scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1 },
+  })
+
+  // Snappy batch stagger for APK tiles & Web cards (never leaves cards stuck at opacity:0).
+  ScrollTrigger.batch('.tile, .web-card', {
+    start: 'top 92%',
+    once: true,
+    onEnter: (batch) => {
+      gsap.fromTo(batch, { y: 22, scale: 0.98 }, {
+        y: 0, scale: 1, duration: 0.42, stagger: 0.06, ease: 'power3.out', overwrite: 'auto',
+      })
+    },
+  })
+
+  // Curtain clip-path unmask on Web preview thumbnails.
+  if (document.querySelectorAll('#home-web .web-thumb').length) {
+    gsap.from('#home-web .web-thumb', {
+      clipPath: 'inset(8% 0% 8% 0%)', duration: 0.52, stagger: 0.08, ease: 'power3.out',
+      scrollTrigger: { trigger: '#home-web', start: 'top 90%', once: true },
     })
   }
+
   const about = document.querySelector('.tentang')
   if (about) {
     gsap.from(about, {
-      y: 16, duration: 0.5, ease: 'power3.out',
-      scrollTrigger: { trigger: about, start: 'top 85%', toggleActions: 'play none none none' },
+      y: 16, duration: 0.45, ease: 'power3.out',
+      scrollTrigger: { trigger: about, start: 'top 90%', once: true },
     })
   }
   window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true })

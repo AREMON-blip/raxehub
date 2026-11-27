@@ -74,11 +74,15 @@ async function bootHome() {
   const mount = document.getElementById('tiles')
   mount.innerHTML = skeletonCards(3)
   const apps = await loadCatalog('apk', APK_SEED)
+  const rilisTitle = document.getElementById('rilis-title')
+  if (rilisTitle) rilisTitle.textContent = `${apps.length} di rak`
   mount.innerHTML = apps.map((app, index) => tileHtml(app, index === 0)).join('')
   const webMount = document.getElementById('home-web')
   if (webMount) {
     webMount.innerHTML = skeletonCards(2)
     const webs = await loadCatalog('web', WEB_SEED)
+    const webTitle = document.getElementById('web-home-title')
+    if (webTitle) webTitle.textContent = `${webs.length} yang live`
     webMount.innerHTML = webs.map(webCard).join('')
   }
   wireCards()
@@ -101,7 +105,7 @@ async function bootApk() {
 function webCard(app) {
   const live = !!app.live_url
   const source = !!app.repo_url
-  return `<article class="card web-card">
+  return `<article class="card web-card" data-reveal>
     <div class="web-thumb" style="overflow:hidden">${previewHtml(app)}</div>
     <div class="web-body">
       <div class="tile-top"><h3 class="h3">${esc(app.name)}</h3><span class="badge">WEB</span></div>
@@ -114,7 +118,7 @@ function webCard(app) {
           : '<button class="btn" disabled type="button">Buka live</button>'}
         ${source
           ? `<a class="btn btn-secondary" href="${esc(app.repo_url)}" target="_blank" rel="noopener noreferrer">Source</a>`
-          : '<button class="btn btn-secondary" disabled type="button">Source</button>'}
+          : ''}
       </div>
     </div>
   </article>`
@@ -123,12 +127,13 @@ function webCard(app) {
 async function bootWeb() {
   renderChrome('web', [
     'Tautan live dibuka di tab baru.',
-    'Tombol Source aktif hanya bila repo publik tersedia.',
+    'Tombol Source hanya muncul bila repo publik tersedia.',
   ])
   const mount = document.getElementById('catalog')
   mount.innerHTML = `<div class="web-grid">${skeletonCards(2)}</div>`
   const apps = await loadCatalog('web', WEB_SEED)
   mount.innerHTML = `<div class="web-grid">${apps.map(webCard).join('')}</div>`
+  wireCards()
 }
 
 function seedFor(slug) {
@@ -147,7 +152,7 @@ function webDetail(app) {
       <div class="chip-row">${(app.stack || []).map((chip) => `<span class="chip">${esc(chip)}</span>`).join('')}</div>
       <div class="btn-row">
         ${app.live_url ? `<a class="btn btn-primary" href="${esc(app.live_url)}" target="_blank" rel="noopener noreferrer">Buka live</a>` : '<button class="btn" disabled type="button">Buka live</button>'}
-        ${app.repo_url ? `<a class="btn btn-secondary" href="${esc(app.repo_url)}" target="_blank" rel="noopener noreferrer">Source</a>` : '<button class="btn btn-secondary" disabled type="button">Source</button>'}
+        ${app.repo_url ? `<a class="btn btn-secondary" href="${esc(app.repo_url)}" target="_blank" rel="noopener noreferrer">Source</a>` : ''}
       </div>
     </div>`
 }
