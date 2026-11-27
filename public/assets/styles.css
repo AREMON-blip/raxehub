@@ -190,6 +190,9 @@ h1, h2, h3, p { margin: 0; }
   position: relative; display: grid; align-items: center;
   overflow: hidden; padding-block: clamp(44px, 7vh, 80px);
 }
+.page-hero { position: relative; overflow: hidden; }
+.page-hero-inner { position: relative; z-index: 1; }
+.page-hero:hover .hero-glow { opacity: 1; }
 .hero-grid {
   position: absolute; inset: -40px 0; pointer-events: none; opacity: 0.22;
   background-image:
@@ -272,7 +275,7 @@ h1, h2, h3, p { margin: 0; }
 }
 
 /* selection & picking animations */
-.tile-icon, .badge, .web-thumb img, .nav-link, select {
+.tile-icon, .badge, .web-thumb img, select {
   transition: transform 240ms var(--ease), border-color 220ms var(--ease), color 220ms var(--ease), background-color 220ms var(--ease), opacity 220ms var(--ease), box-shadow 240ms var(--ease);
 }
 .card:hover, .card:focus-within {
