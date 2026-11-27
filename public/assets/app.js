@@ -1,6 +1,6 @@
 import {
   APK_SEED, WEB_SEED, ApiFailure, PK, api, copyButton, esc,
-  formatBytes, initCatalogMotion, initLandingMotion, listApps, mergeCatalog, renderChangelogHtml, renderChrome, skeletonCards,
+  formatBytes, initCatalogMotion, initDetailMotion, initLandingMotion, listApps, mergeCatalog, renderChangelogHtml, renderChrome, skeletonCards,
   wireCards, wireCopy,
 } from './shared.js'
 
@@ -268,6 +268,7 @@ async function bootDetail() {
     if (copyBtn && opt?.dataset.sha) copyBtn.dataset.copy = opt.dataset.sha
   })
   wireCards()
+  initDetailMotion()
 }
 
 function bootRejected() {

@@ -271,6 +271,28 @@ export function wireCards() {
   })
 }
 
+function scrambleText(el, durationMs = 520) {
+  if (!el || isReduced()) return
+  const target = el.dataset.scrambleOrig || el.textContent || ''
+  el.dataset.scrambleOrig = target
+  const glyphs = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/+-'
+  const start = performance.now()
+  const step = (now) => {
+    const progress = Math.min(1, (now - start) / durationMs)
+    const lockCount = Math.floor(progress * target.length)
+    let out = ''
+    for (let i = 0; i < target.length; i += 1) {
+      const ch = target[i]
+      if (ch === ' ' || ch === '/' || i < lockCount) out += ch
+      else out += glyphs[Math.floor(Math.random() * glyphs.length)]
+    }
+    el.textContent = out
+    if (progress < 1) requestAnimationFrame(step)
+    else el.textContent = target
+  }
+  requestAnimationFrame(step)
+}
+
 export async function initLandingMotion() {
   const host = document.querySelector('[data-mark]')
   if (host) {
@@ -372,14 +394,135 @@ export async function initLandingMotion() {
     })
   }
 
-  const about = document.querySelector('.tentang')
-  if (about) {
-    gsap.from(about, {
-      y: 16, duration: 0.45, ease: 'power3.out',
-      scrollTrigger: { trigger: about, start: 'top 90%', once: true },
+  // Ambient cursor glow & subtle mark depth using gsap.quickTo (compositor-only).
+  const hero = document.querySelector('.hero')
+  const glow = document.querySelector('.hero-glow')
+  if (hero && glow && finePointer()) {
+    const xGlow = gsap.quickTo(glow, 'x', { duration: 0.45, ease: 'power3' })
+    const yGlow = gsap.quickTo(glow, 'y', { duration: 0.45, ease: 'power3' })
+    const markEl = hero.querySelector('.hero-mark-host')
+    const xMark = markEl ? gsap.quickTo(markEl, 'x', { duration: 0.5, ease: 'power3' }) : null
+    const yMark = markEl ? gsap.quickTo(markEl, 'y', { duration: 0.5, ease: 'power3' }) : null
+    hero.addEventListener('pointermove', (event) => {
+      const rect = hero.getBoundingClientRect()
+      const rx = event.clientX - rect.left
+      const ry = event.clientY - rect.top
+      xGlow(rx - 210)
+      yGlow(ry - 210)
+      if (xMark && yMark) {
+        xMark(((rx / rect.width) - 0.5) * 14)
+        yMark(((ry / rect.height) - 0.5) * 10)
+      }
+    })
+    hero.addEventListener('pointerleave', () => { xMark?.(0); yMark?.(0) })
+  }
+
+  // Gentle ambient breath on background plates & floating hero mark (pure transform).
+  gsap.to('.plate-a', { rotation: 16, y: -14, duration: 5.2, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+  gsap.to('.plate-b', { rotation: -13, y: 14, duration: 5.8, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+  gsap.to('.hero-mark-host svg', { y: -6, duration: 2.8, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+
+  // Subtle idle drift on giant ghost typography so hero feels alive even before scroll.
+  gsap.fromTo('.ghost-a', { xPercent: -2 }, { xPercent: 3, duration: 7.5, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+  gsap.fromTo('.ghost-b', { xPercent: 2 }, { xPercent: -3, duration: 8.2, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+
+  // Floating micro-sparks particle field inside hero.
+  const sparkHost = document.querySelector('.hero-sparks')
+  if (sparkHost && !sparkHost.childElementCount) {
+    for (let i = 0; i < 14; i += 1) {
+      const dot = document.createElement('span')
+      dot.className = 'hero-spark'
+      dot.style.left = `${(i * 7.3 + 4) % 94}%`
+      dot.style.top = `${(i * 19.7 + 10) % 86}%`
+      sparkHost.appendChild(dot)
+      gsap.fromTo(dot,
+        { opacity: 0.12, scale: 0.65, y: 0, x: 0 },
+        {
+          opacity: 0.75, scale: 1.35,
+          y: (i % 2 === 0 ? -1 : 1) * (18 + (i % 4) * 8),
+          x: (i % 3 === 0 ? 1 : -1) * (10 + (i % 3) * 6),
+          duration: 2.6 + (i % 5) * 0.65,
+          delay: (i % 4) * 0.35,
+          repeat: -1, yoyo: true, ease: 'sine.inOut',
+        },
+      )
+    }
+  }
+
+  // Editorial text scramble on hero eyebrow & interactive hover scramble on RaxeHub wordmark.
+  scrambleText(document.querySelector('.hero-type .label'), 640)
+  const navWord = document.querySelector('.nav-word')
+  if (navWord && !navWord.dataset.scrambleWired) {
+    navWord.dataset.scrambleWired = '1'
+    navWord.addEventListener('pointerenter', () => scrambleText(navWord, 360))
+  }
+  gsap.from('.nav-link', { y: -8, opacity: 0, duration: 0.36, stagger: 0.05, ease: 'power3.out' })
+
+  const footer = document.querySelector('.footer-grid')
+  if (footer) {
+    gsap.from(footer.children, {
+      y: 12, opacity: 0, duration: 0.4, stagger: 0.06, ease: 'power3.out',
+      scrollTrigger: { trigger: footer, start: 'top 96%', once: true },
     })
   }
+
+  const about = document.querySelector('.tentang')
+  if (about) {
+    const aboutTl = gsap.timeline({
+      defaults: { ease: 'power3.out' },
+      scrollTrigger: { trigger: about, start: 'top 88%', once: true },
+    })
+    aboutTl
+      .from(about.querySelectorAll('.label, .h2'), { y: 16, duration: 0.44, stagger: 0.06 })
+      .from(about.querySelector('.tentang-line'), { scaleX: 0, duration: 0.46 }, '-=0.28')
+      .from(about.querySelectorAll('p'), { y: 14, duration: 0.42, stagger: 0.08 }, '-=0.28')
+  }
+  gsap.utils.toArray('#rilis-title, #web-home-title').forEach((heading) => {
+    gsap.from(heading, {
+      y: 16, duration: 0.42, ease: 'power3.out',
+      scrollTrigger: { trigger: heading, start: 'top 92%', once: true },
+    })
+  })
   window.addEventListener('load', () => ScrollTrigger.refresh(), { once: true })
+}
+
+export async function initDetailMotion() {
+  if (isReduced()) return
+  try {
+    await Promise.all([
+      loadScript('https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js'),
+    ])
+  } catch { return }
+
+  const { gsap, ScrollTrigger, Lenis } = window
+  gsap.registerPlugin(ScrollTrigger)
+  const lenis = new Lenis({ lerp: 0.12 })
+  lenis.on('scroll', ScrollTrigger.update)
+  gsap.ticker.add((time) => lenis.raf(time * 1000))
+  gsap.ticker.lagSmoothing(0)
+
+  const head = document.querySelector('.detail-head')
+  if (head) {
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+    tl.from(head.querySelector('.detail-icon'), { scale: 0.9, y: 10, duration: 0.42 })
+      .from(head.querySelectorAll('.badge, .h1, .lead'), { y: 14, duration: 0.4, stagger: 0.05 }, '<0.06')
+  }
+  ScrollTrigger.batch('.shot', {
+    start: 'top 92%',
+    once: true,
+    onEnter: (batch) => {
+      gsap.fromTo(batch, { y: 18, scale: 0.96 }, { y: 0, scale: 1, duration: 0.4, stagger: 0.06, ease: 'power3.out', overwrite: 'auto' })
+    },
+  })
+  ScrollTrigger.batch('.version-row', {
+    start: 'top 94%',
+    once: true,
+    onEnter: (batch) => {
+      gsap.fromTo(batch, { y: 14 }, { y: 0, duration: 0.36, stagger: 0.05, ease: 'power3.out', overwrite: 'auto' })
+    },
+  })
 }
 
 export async function initCatalogMotion() {
