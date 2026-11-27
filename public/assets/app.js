@@ -15,7 +15,23 @@ const STATIC_SHOTS = {
   'gps-tracker': [1, 2, 3].map((n) => ({ src: `/screenshots/gps-tracker-${n}.png`, caption: `Tampilan ${n}` })),
 }
 
-const ICON_FALLBACK_JS = "if(this.dataset.fallback&&!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallback}else{var p=this.parentNode;p.textContent=p.dataset.initials||'';p.removeAttribute('style')}"
+// CSP-safe delegated image fallback (zero inline onerror handlers).
+document.addEventListener('error', (event) => {
+  const img = event.target
+  if (!(img instanceof HTMLImageElement)) return
+  if (img.dataset.iconImg === '1') {
+    if (img.dataset.fallback && !img.dataset.tried) {
+      img.dataset.tried = '1'
+      img.src = img.dataset.fallback
+    } else if (img.parentNode instanceof HTMLElement) {
+      const parent = img.parentNode
+      parent.textContent = parent.dataset.initials || ''
+      parent.removeAttribute('style')
+    }
+  } else if (img.dataset.previewFallback && img.parentNode instanceof HTMLElement) {
+    img.parentNode.textContent = img.dataset.previewFallback
+  }
+}, true)
 
 // 3-tier icon: DB icon_key (/api/icon/<slug>) > static /icons/<slug>.png > initials.
 function iconHtml(app, large = false) {
@@ -26,8 +42,8 @@ function iconHtml(app, large = false) {
   const primary = app.icon_key ? `/api/icon/${slug}` : `/icons/${slug}.png`
   const fallback = app.icon_key ? `/icons/${slug}.png` : ''
   return `<span class="${cls}" data-initials="${initials}" style="width:${size}px;height:${size}px;background:#19191B;border-color:#2A2A2C">
-    <img src="${primary}" data-fallback="${fallback}" alt="${esc(app.name)}" width="${size}" height="${size}"
-      loading="lazy" onerror="${ICON_FALLBACK_JS}" style="display:block;width:100%;height:100%;object-fit:contain">
+    <img src="${primary}" data-icon-img="1" data-fallback="${fallback}" alt="${esc(app.name)}" width="${size}" height="${size}"
+      loading="lazy" style="display:block;width:100%;height:100%;object-fit:contain">
   </span>`
 }
 
@@ -35,8 +51,7 @@ function previewHtml(app) {
   const slug = encodeURIComponent(app.slug)
   const fallbackLabel = `WEB / ${esc(app.name.slice(0, 2).toUpperCase())}`
   if (app.preview_key) {
-    return `<img src="/api/preview/${slug}" alt="Pratinjau ${esc(app.name)}" loading="lazy"
-      onerror="this.parentNode.textContent='${fallbackLabel}'"
+    return `<img src="/api/preview/${slug}" data-preview-fallback="${fallbackLabel}" alt="Pratinjau ${esc(app.name)}" loading="lazy"
       style="display:block;width:100%;height:100%;object-fit:cover">`
   }
   if (!PREVIEW_SLUGS.has(app.slug)) return fallbackLabel
