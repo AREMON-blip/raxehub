@@ -40,7 +40,14 @@
           <div class="field" style="grid-column:1/-1"><label class="label" for="f-desc">Deskripsi</label><textarea id="f-desc" name="description" placeholder="Deskripsi 2–3 baris"></textarea></div>
           <div class="field"><label class="label" for="f-version">Nama versi</label><input id="f-version" name="versionName" required placeholder="2.0.1"></div>
           <div class="field"><label class="label" for="f-code">Kode versi</label><input id="f-code" name="versionCode" type="number" min="1" required placeholder="201"></div>
-          <div class="field" style="grid-column:1/-1"><label class="label" for="f-notes">Catatan rilis</label><textarea id="f-notes" name="releaseNotes" placeholder="Perubahan pada versi ini"></textarea></div>
+          <div class="field" style="grid-column:1/-1">
+            <div class="field-head">
+              <label class="label" for="f-notes">Catatan rilis (per poin)</label>
+              <button class="btn btn-secondary" id="btn-tidy-notes" type="button" style="height:32px;padding:4px 12px;font-size:0.75rem">Auto rapihin</button>
+            </div>
+            <textarea id="f-notes" name="releaseNotes" placeholder="Tempel catatan rilis bebas, lalu klik Auto rapihin…"></textarea>
+            <div id="notes-preview" class="notes-preview" hidden></div>
+          </div>
           <div class="field"><label class="label" for="f-sort">Urutan</label><input id="f-sort" name="sort" type="number" value="0"></div>
           <div class="field"><label class="label" for="f-apk">Berkas APK (maks. 80 MB)</label><input id="f-apk" name="apk" type="file" accept=".apk" required></div>
           <div class="field" style="grid-column:1/-1"><label class="label" for="f-icon">Logo (opsional, PNG 512px, maks. 2 MB)</label><input id="f-icon" name="icon" type="file" accept="image/png"></div>

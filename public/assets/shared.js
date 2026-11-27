@@ -429,6 +429,69 @@ export async function initCatalogMotion() {
   }
 }
 
+const HEADING_RE = /^(fitur baru|perbaikan(?: & penyempurnaan)?|penyempurnaan|perubahan|bug\s*fix(?:es)?|catatan|peningkatan|added|fixed|changed|improved|removed|update[sd]?|whats? new)$/i
+
+export function formatChangelog(raw) {
+  const input = String(raw || '').replace(/\r\n?/g, '\n').trim()
+  if (!input) return ''
+  let lines = input.split('\n').map((l) => l.replace(/[ \t]+/g, ' ').trim()).filter(Boolean)
+  if (lines.length === 1 && lines[0].includes(';')) {
+    const parts = lines[0].split(/\s*;\s*/).map((s) => s.trim()).filter(Boolean)
+    if (parts.length > 1) lines = parts
+  }
+  const out = []
+  const bulletRe = /^(?:[-–—*•▪▸]+|\d+[.)])\s*/
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i]
+    const hasBullet = bulletRe.test(line)
+    const stripped = line.replace(bulletRe, '').trim()
+    if (!stripped) continue
+    const noColon = stripped.replace(/:$/, '').trim()
+    const isHeading = !hasBullet && noColon.length <= 42 && (
+      HEADING_RE.test(noColon) ||
+      (stripped.endsWith(':') && !noColon.includes(':'))
+    )
+    if (isHeading) {
+      if (out.length && out[out.length - 1] !== '') out.push('')
+      out.push(`${noColon.charAt(0).toUpperCase()}${noColon.slice(1)}:`)
+    } else {
+      const cap = stripped.charAt(0).toUpperCase() + stripped.slice(1)
+      out.push(`- ${cap}`)
+    }
+  }
+  return out.join('\n')
+}
+
+export function renderChangelogHtml(raw) {
+  const formatted = formatChangelog(raw)
+  if (!formatted) return '<p class="body muted">Tanpa catatan rilis.</p>'
+  const lines = formatted.split('\n')
+  const blocks = []
+  let items = []
+  const flush = () => {
+    if (!items.length) return
+    blocks.push(`<ul class="changelog-list">${items.join('')}</ul>`)
+    items = []
+  }
+  for (const line of lines) {
+    if (!line.trim()) continue
+    if (line.startsWith('- ')) {
+      const body = line.slice(2).trim()
+      const idx = body.indexOf(':')
+      const hasLead = idx > 1 && idx <= 64 && body.slice(idx + 1).trim().length > 0 && !/^https?$/i.test(body.slice(0, idx))
+      const content = hasLead
+        ? `<strong class="changelog-lead">${esc(body.slice(0, idx))}</strong>: ${esc(body.slice(idx + 1).trim())}`
+        : esc(body)
+      items.push(`<li>${content}</li>`)
+    } else {
+      flush()
+      blocks.push(`<h4 class="changelog-heading">${esc(line.replace(/:$/, ''))}</h4>`)
+    }
+  }
+  flush()
+  return `<div class="changelog-block">${blocks.join('')}</div>`
+}
+
 export function copyButton(text) {
   return `<button class="btn btn-secondary" type="button" data-copy="${esc(text)}" style="height:36px;padding:6px 12px;font-size:0.8125rem">Salin</button>`
 }

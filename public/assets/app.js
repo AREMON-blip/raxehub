@@ -1,6 +1,6 @@
 import {
   APK_SEED, WEB_SEED, ApiFailure, PK, api, copyButton, esc,
-  formatBytes, initCatalogMotion, initLandingMotion, listApps, mergeCatalog, renderChrome, skeletonCards,
+  formatBytes, initCatalogMotion, initLandingMotion, listApps, mergeCatalog, renderChangelogHtml, renderChrome, skeletonCards,
   wireCards, wireCopy,
 } from './shared.js'
 
@@ -187,7 +187,7 @@ function apkDetail(app, detail) {
   const changelog = versions.length
     ? versions.map((item) => `<div class="version-row">
         <div class="version-meta"><span class="label">v${esc(item.version_name)}</span><span class="chip">${esc(formatBytes(item.size_bytes))}</span></div>
-        <p class="body secondary">${esc(item.release_notes || 'Tanpa catatan rilis.')}</p>
+        ${renderChangelogHtml(item.release_notes)}
       </div>`).join('')
     : '<p class="body muted">Belum ada riwayat rilis.</p>'
   return `<div class="detail-head">

@@ -1,4 +1,4 @@
-import { ApiFailure, api, esc, ensureIdentity, listApps, renderChrome, signOut } from './shared.js'
+import { ApiFailure, api, esc, ensureIdentity, formatChangelog, listApps, renderChangelogHtml, renderChrome, signOut } from './shared.js'
 import { sha256File } from './sha256.js'
 
 const MAX_UPLOAD_BYTES = 80 * 1024 * 1024
@@ -110,6 +110,24 @@ async function bootAdmin(identity) {
   const submit = form.querySelector('button[type="submit"]')
   let appCache = await refreshAppSelect(identity, form)
   form.appSelect.addEventListener('change', () => applyAppSelection(form, appCache))
+  const notesEl = document.getElementById('f-notes')
+  const notesPreview = document.getElementById('notes-preview')
+  const updateNotesPreview = () => {
+    if (!notesEl || !notesPreview) return
+    const raw = notesEl.value.trim()
+    notesPreview.hidden = !raw
+    notesPreview.innerHTML = raw ? `<span class="label">PRATINJAU CHANGELOG</span>${renderChangelogHtml(raw)}` : ''
+  }
+  notesEl?.addEventListener('input', updateNotesPreview)
+  document.getElementById('btn-tidy-notes')?.addEventListener('click', () => {
+    if (!notesEl) return
+    notesEl.value = formatChangelog(notesEl.value)
+    notesEl.classList.remove('is-picking')
+    void notesEl.offsetWidth
+    notesEl.classList.add('is-picking')
+    window.setTimeout(() => notesEl.classList.remove('is-picking'), 360)
+    updateNotesPreview()
+  })
   form.addEventListener('submit', async (event) => {
     event.preventDefault()
     status('')
@@ -149,7 +167,7 @@ async function bootAdmin(identity) {
           appId,
           versionName: form.versionName.value.trim(),
           versionCode: Number(form.versionCode.value),
-          releaseNotes: form.releaseNotes.value.trim() || null,
+          releaseNotes: formatChangelog(form.releaseNotes.value) || null,
           apkKey: signed.key,
           sizeBytes: file.size,
           sha256,
