@@ -89,11 +89,6 @@ async function bootHome() {
     <div class="marquee-group">${cardsHtml}</div>
     <div class="marquee-group marquee-clone" aria-hidden="true">${cardsHtml}</div>
   </div>`
-  const toggleBtn = document.getElementById('marquee-toggle')
-  toggleBtn?.addEventListener('click', () => {
-    const paused = mount.classList.toggle('is-paused')
-    toggleBtn.textContent = paused ? 'Putar' : 'Jeda'
-  })
   const webMount = document.getElementById('home-web')
   if (webMount) {
     webMount.innerHTML = skeletonCards(2)
@@ -272,6 +267,7 @@ async function bootDetail() {
     const copyBtn = mount.querySelector('[data-copy]')
     if (copyBtn && opt?.dataset.sha) copyBtn.dataset.copy = opt.dataset.sha
   })
+  wireCards()
 }
 
 function bootRejected() {

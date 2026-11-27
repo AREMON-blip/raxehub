@@ -220,11 +220,28 @@ export function mergeCatalog(seed, live) {
 }
 
 export function wireCards() {
+  const pulseSelect = (el) => {
+    if (!el) return
+    el.classList.remove('is-picking')
+    void el.offsetWidth
+    el.classList.add('is-picking')
+    window.setTimeout(() => el.classList.remove('is-picking'), 360)
+  }
   document.querySelectorAll('[data-detail-link]').forEach((link) => {
     link.addEventListener('click', () => {
-      const icon = link.querySelector('.tile-icon')
+      const card = link.closest('.card')
+      pulseSelect(card)
+      const icon = link.closest('.card')?.querySelector('.tile-icon') || link.querySelector('.tile-icon')
       if (icon && 'viewTransitionName' in icon.style) icon.style.viewTransitionName = 'app-icon'
     })
+  })
+  document.querySelectorAll('.web-card .btn, .nav-link').forEach((control) => {
+    control.addEventListener('pointerdown', () => pulseSelect(control.closest('.card') || control))
+  })
+  document.querySelectorAll('select').forEach((sel) => {
+    if (sel.dataset.pickWired) return
+    sel.dataset.pickWired = '1'
+    sel.addEventListener('change', () => pulseSelect(sel))
   })
   if (!finePointer() || isReduced()) return
   document.querySelectorAll('[data-magnetic]').forEach((node) => {
