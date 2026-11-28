@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css?v=2">
   <script src="/config"></script>
 </head>
 <body data-page="admin">
@@ -34,7 +34,7 @@
           </div>
           <div class="field" id="existing-releases-wrap" style="grid-column:1/-1" hidden>
             <div class="field-head">
-              <span class="label">RILIS YANG SUDAH ADA (EDIT APK / CHANGELOG)</span>
+              <span class="label">RILIS YANG SUDAH ADA (VERSI · KODE · APK · CHANGELOG)</span>
               <span class="chip" id="existing-releases-count">0 versi</span>
             </div>
             <div id="existing-releases-list" class="release-list"></div>
@@ -116,7 +116,7 @@
       <div class="drawer-head">
         <div>
           <span class="label" id="drawer-sub">EDIT RILIS</span>
-          <h2 class="h2" id="drawer-title" style="margin-top:6px">Ubah APK & Changelog</h2>
+          <h2 class="h2" id="drawer-title" style="margin-top:6px">Edit Versi, Kode, APK & Changelog</h2>
         </div>
         <button class="btn btn-secondary" id="drawer-close" type="button" aria-label="Tutup drawer" style="height:36px;padding:6px 12px">Tutup</button>
       </div>
@@ -153,6 +153,6 @@
     </div>
   </div>
   <div id="footer-mount"></div>
-  <script type="module" src="/assets/admin.js"></script>
+  <script type="module" src="/assets/admin.js?v=2"></script>
 </body>
 </html>

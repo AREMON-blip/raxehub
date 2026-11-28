@@ -179,14 +179,18 @@ async function bootAdmin(identity) {
         releasesList.innerHTML = '<span class="status-line">Belum ada versi yang diunggah.</span>'
         return
       }
-      releasesList.innerHTML = versionCache.map((v, idx) => `
+      releasesList.innerHTML = versionCache.map((v) => `
         <div class="release-item">
           <div class="release-info">
-            <span class="label">v${esc(v.version_name)}${idx === 0 ? ' · Terbaru' : ''}</span>
+            <span class="label">v${esc(v.version_name)}${v.active ? ' · Aktif' : ''}</span>
+            <span class="chip">code ${esc(v.version_code)}</span>
             <span class="chip">${esc(formatBytes(v.size_bytes))}</span>
             <span class="release-snippet">${esc((v.release_notes || 'Tanpa catatan').replace(/\s+/g, ' ').slice(0, 72))}</span>
           </div>
-          <button class="btn btn-secondary" type="button" data-edit-version="${esc(v.id)}" style="height:34px;padding:4px 12px;font-size:0.75rem">Edit</button>
+          <div class="btn-row" style="gap:6px;flex-wrap:nowrap">
+            ${v.active ? '' : `<button class="btn btn-secondary" type="button" data-rollback-version="${esc(v.id)}" style="height:34px;padding:4px 10px;font-size:0.75rem">Undo / Aktifkan</button>`}
+            <button class="btn btn-secondary" type="button" data-edit-version="${esc(v.id)}" style="height:34px;padding:4px 12px;font-size:0.75rem">Edit</button>
+          </div>
         </div>
       `).join('')
     } catch {
@@ -194,8 +198,27 @@ async function bootAdmin(identity) {
     }
   }
 
-  releasesList?.addEventListener('click', (event) => {
-    const btn = event.target instanceof Element ? event.target.closest('[data-edit-version]') : null
+  releasesList?.addEventListener('click', async (event) => {
+    const target = event.target instanceof Element ? event.target : null
+    const rollbackBtn = target?.closest('[data-rollback-version]')
+    if (rollbackBtn) {
+      const id = rollbackBtn.dataset.rollbackVersion
+      rollbackBtn.disabled = true
+      rollbackBtn.textContent = 'Mengaktifkan…'
+      try {
+        await api(`/api/admin/versions/${encodeURIComponent(id)}`, {
+          identity, method: 'PATCH', body: { active: true },
+        })
+        await loadExistingReleases(activeSlug)
+        status(`Versi aktif berhasil dikembalikan (rollback).`)
+      } catch (error) {
+        status(error.message || 'Gagal mengaktifkan versi.')
+        rollbackBtn.disabled = false
+        rollbackBtn.textContent = 'Undo / Aktifkan'
+      }
+      return
+    }
+    const btn = target?.closest('[data-edit-version]')
     if (!btn) return
     const v = versionCache.find((item) => item.id === btn.dataset.editVersion)
     if (v) openDrawer(v)

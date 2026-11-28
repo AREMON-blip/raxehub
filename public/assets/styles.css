@@ -473,6 +473,7 @@ select, input, textarea {
 }
 textarea { min-height: 96px; resize: vertical; }
 .field { display: grid; gap: 8px; }
+[hidden] { display: none !important; }
 .form-grid { display: grid; gap: 16px; }
 @media (min-width: 720px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
 .progress { height: 6px; background: var(--card); border-radius: 6px; overflow: hidden; border: 1px solid var(--hair); }
