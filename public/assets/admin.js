@@ -1,4 +1,4 @@
-import { ApiFailure, api, esc, ensureIdentity, formatChangelog, listApps, renderChangelogHtml, renderChrome, signOut } from './shared.js'
+import { ApiFailure, api, esc, ensureIdentity, formatBytes, formatChangelog, listApps, renderChangelogHtml, renderChrome, signOut } from './shared.js'
 import { sha256File } from './sha256.js'
 
 const MAX_UPLOAD_BYTES = 80 * 1024 * 1024
@@ -109,7 +109,167 @@ async function bootAdmin(identity) {
   const form = document.getElementById('admin-form')
   const submit = form.querySelector('button[type="submit"]')
   let appCache = await refreshAppSelect(identity, form)
-  form.appSelect.addEventListener('change', () => applyAppSelection(form, appCache))
+  let versionCache = []
+  let activeSlug = ''
+
+  const releasesWrap = document.getElementById('existing-releases-wrap')
+  const releasesList = document.getElementById('existing-releases-list')
+  const releasesCount = document.getElementById('existing-releases-count')
+  const drawer = document.getElementById('version-drawer')
+  const editForm = document.getElementById('edit-version-form')
+  const editNotesEl = document.getElementById('e-notes')
+  const editNotesPreview = document.getElementById('e-notes-preview')
+  const editStatus = (msg) => { const el = $('[data-edit-status]'); if (el) el.textContent = msg }
+
+  const updateEditPreview = () => {
+    if (!editNotesEl || !editNotesPreview) return
+    const raw = editNotesEl.value.trim()
+    editNotesPreview.hidden = !raw
+    editNotesPreview.innerHTML = raw ? `<span class="label">PRATINJAU CHANGELOG</span>${renderChangelogHtml(raw)}` : ''
+  }
+
+  const closeDrawer = () => {
+    if (!drawer) return
+    drawer.classList.remove('is-open')
+    drawer.setAttribute('aria-hidden', 'true')
+    window.setTimeout(() => { if (!drawer.classList.contains('is-open')) drawer.hidden = true }, 240)
+  }
+
+  const openDrawer = (version) => {
+    if (!drawer || !editForm || !version) return
+    editForm.versionId.value = version.id
+    editForm.slug.value = activeSlug
+    editForm.versionName.value = version.version_name || ''
+    editForm.versionCode.value = version.version_code ?? ''
+    editForm.releaseNotes.value = version.release_notes || ''
+    editForm.apk.value = ''
+    const sub = document.getElementById('drawer-sub')
+    const title = document.getElementById('drawer-title')
+    const curFile = document.getElementById('e-current-file')
+    if (sub) sub.textContent = `EDIT RILIS · ${activeSlug.toUpperCase()}`
+    if (title) title.textContent = `v${version.version_name}`
+    if (curFile) curFile.textContent = `Saat ini: ${version.apk_key} (${formatBytes(version.size_bytes)})`
+    const progWrap = document.getElementById('e-progress-wrap')
+    if (progWrap) progWrap.hidden = true
+    progress('#e-hash-bar', 0)
+    progress('#e-upload-bar', 0)
+    editStatus('')
+    updateEditPreview()
+    drawer.hidden = false
+    drawer.setAttribute('aria-hidden', 'false')
+    requestAnimationFrame(() => drawer.classList.add('is-open'))
+  }
+
+  const loadExistingReleases = async (slug) => {
+    activeSlug = slug && slug !== NEW_APP ? slug : ''
+    if (!releasesWrap || !releasesList) return
+    if (!activeSlug) {
+      versionCache = []
+      releasesWrap.hidden = true
+      releasesList.innerHTML = ''
+      return
+    }
+    releasesWrap.hidden = false
+    releasesList.innerHTML = '<span class="status-line">Memuat daftar rilis…</span>'
+    try {
+      const detail = await api(`/api/apps/${encodeURIComponent(activeSlug)}`, { identity })
+      versionCache = Array.isArray(detail?.versions) ? detail.versions : []
+      if (releasesCount) releasesCount.textContent = `${versionCache.length} versi`
+      if (!versionCache.length) {
+        releasesList.innerHTML = '<span class="status-line">Belum ada versi yang diunggah.</span>'
+        return
+      }
+      releasesList.innerHTML = versionCache.map((v, idx) => `
+        <div class="release-item">
+          <div class="release-info">
+            <span class="label">v${esc(v.version_name)}${idx === 0 ? ' · Terbaru' : ''}</span>
+            <span class="chip">${esc(formatBytes(v.size_bytes))}</span>
+            <span class="release-snippet">${esc((v.release_notes || 'Tanpa catatan').replace(/\s+/g, ' ').slice(0, 72))}</span>
+          </div>
+          <button class="btn btn-secondary" type="button" data-edit-version="${esc(v.id)}" style="height:34px;padding:4px 12px;font-size:0.75rem">Edit</button>
+        </div>
+      `).join('')
+    } catch {
+      releasesList.innerHTML = '<span class="status-line">Gagal memuat daftar rilis.</span>'
+    }
+  }
+
+  releasesList?.addEventListener('click', (event) => {
+    const btn = event.target instanceof Element ? event.target.closest('[data-edit-version]') : null
+    if (!btn) return
+    const v = versionCache.find((item) => item.id === btn.dataset.editVersion)
+    if (v) openDrawer(v)
+  })
+  document.getElementById('drawer-close')?.addEventListener('click', closeDrawer)
+  document.getElementById('drawer-cancel')?.addEventListener('click', closeDrawer)
+  drawer?.addEventListener('click', (event) => { if (event.target === drawer) closeDrawer() })
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && drawer?.classList.contains('is-open')) closeDrawer()
+  })
+  editNotesEl?.addEventListener('input', updateEditPreview)
+  document.getElementById('e-tidy-notes')?.addEventListener('click', () => {
+    if (!editNotesEl) return
+    editNotesEl.value = formatChangelog(editNotesEl.value)
+    editNotesEl.classList.remove('is-picking')
+    void editNotesEl.offsetWidth
+    editNotesEl.classList.add('is-picking')
+    window.setTimeout(() => editNotesEl.classList.remove('is-picking'), 360)
+    updateEditPreview()
+  })
+  editForm?.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    const versionId = editForm.versionId.value
+    const slug = editForm.slug.value
+    const versionName = editForm.versionName.value.trim()
+    const versionCode = Number(editForm.versionCode.value)
+    const releaseNotes = formatChangelog(editForm.releaseNotes.value) || null
+    const file = editForm.apk.files[0]
+    if (file) {
+      if (!/\.apk$/i.test(file.name)) return editStatus('Berkas pengganti harus berekstensi .apk.')
+      if (file.size === 0 || file.size > MAX_UPLOAD_BYTES) return editStatus('Ukuran APK harus antara 1 byte dan 80 MB.')
+    }
+    const saveBtn = editForm.querySelector('button[type="submit"]')
+    const progWrap = document.getElementById('e-progress-wrap')
+    saveBtn.disabled = true
+    editStatus('')
+    try {
+      const patch = { versionName, versionCode, releaseNotes }
+      if (file) {
+        if (progWrap) progWrap.hidden = false
+        progress('#e-hash-bar', 0)
+        progress('#e-upload-bar', 0)
+        editStatus('Menghitung SHA256 APK pengganti…')
+        const sha256 = await sha256File(file, (ratio) => progress('#e-hash-bar', ratio))
+        editStatus('Meminta presign R2…')
+        const signed = await api('/api/admin/presign-upload', {
+          identity, method: 'POST',
+          body: { fileName: file.name, sizeBytes: file.size, sha256, slug, versionName },
+        })
+        editStatus('Mengunggah APK pengganti ke R2…')
+        await putFile(signed.uploadUrl, file, (ratio) => progress('#e-upload-bar', ratio))
+        patch.apkKey = signed.key
+        patch.sizeBytes = file.size
+        patch.sha256 = sha256
+      }
+      editStatus('Menyimpan perubahan…')
+      await api(`/api/admin/versions/${encodeURIComponent(versionId)}`, {
+        identity, method: 'PATCH', body: patch,
+      })
+      editStatus('Perubahan tersimpan.')
+      await loadExistingReleases(slug)
+      window.setTimeout(closeDrawer, 420)
+    } catch (error) {
+      editStatus(error.message || 'Gagal menyimpan perubahan.')
+    } finally {
+      saveBtn.disabled = false
+    }
+  })
+
+  form.appSelect.addEventListener('change', () => {
+    applyAppSelection(form, appCache)
+    loadExistingReleases(form.appSelect.value)
+  })
+  loadExistingReleases(form.appSelect.value)
   const notesEl = document.getElementById('f-notes')
   const notesPreview = document.getElementById('notes-preview')
   const updateNotesPreview = () => {
@@ -177,6 +337,7 @@ async function bootAdmin(identity) {
       status(`Selesai. ${signed.key}`)
       $('#admin-result').innerHTML = `<a class="btn btn-secondary" href="/app/${esc(slug)}" style="margin-top:16px">Lihat detail app</a>`
       appCache = await refreshAppSelect(identity, form, slug)
+      await loadExistingReleases(slug)
     } catch (error) {
       if (error instanceof ApiFailure && error.status === 403) {
         status('Akses admin ditolak. Masuk sebagai admin untuk mengunggah.')

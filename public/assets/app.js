@@ -199,11 +199,14 @@ function apkDetail(app, detail) {
   const shots = screenshots.length
     ? screenshots.map((shot) => shotHtml(shot, app)).join('')
     : '<div class="shot"><span>Belum ada screenshot</span></div>'
+  const renderVersionRow = (item, isLatest = false) => `<div class="version-row">
+    <div class="version-meta"><span class="label">v${esc(item.version_name)}${isLatest ? ' · Terbaru' : ''}</span><span class="chip">${esc(formatBytes(item.size_bytes))}</span></div>
+    ${renderChangelogHtml(item.release_notes)}
+  </div>`
   const changelog = versions.length
-    ? versions.map((item) => `<div class="version-row">
-        <div class="version-meta"><span class="label">v${esc(item.version_name)}</span><span class="chip">${esc(formatBytes(item.size_bytes))}</span></div>
-        ${renderChangelogHtml(item.release_notes)}
-      </div>`).join('')
+    ? `${renderVersionRow(versions[0], true)}${versions.length > 1
+        ? `<details class="changelog-more"><summary>Lihat riwayat versi sebelumnya (${versions.length - 1} versi)</summary><div class="changelog-older">${versions.slice(1).map((item) => renderVersionRow(item, false)).join('')}</div></details>`
+        : ''}`
     : '<p class="body muted">Belum ada riwayat rilis.</p>'
   return `<div class="detail-head">
       ${iconHtml(app, true)}
@@ -216,7 +219,7 @@ function apkDetail(app, detail) {
         <section class="stack"><h2 class="h2">Tampilan</h2><div class="shot-grid">${shots}</div></section>
         <section class="stack"><h2 class="h2">Changelog</h2>${changelog}</section>
       </div>
-      <aside class="stack">
+      <aside class="stack detail-aside">
         <div class="field"${versions.length ? '' : ' style="display:none"'}><label class="label" for="version-select">Versi</label>
           <select id="version-select">
             ${versions.map((item, idx) => `<option value="${idx === 0 ? '' : esc(item.id)}" data-sha="${esc(item.sha256)}" data-ver="${esc(item.version_name)}">v${esc(item.version_name)}${idx === 0 ? ' (Terbaru)' : ''}</option>`).join('')}

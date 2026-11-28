@@ -341,6 +341,64 @@ export async function insertVersion(env: Env, input: NewVersion): Promise<Versio
   return { ...rows[0], size_bytes: Number(rows[0].size_bytes) }
 }
 
+export interface VersionPatch {
+  versionName?: string
+  versionCode?: number
+  releaseNotes?: string | null
+  hasReleaseNotes?: boolean
+  apkKey?: string
+  sizeBytes?: number
+  sha256?: string
+  active?: boolean
+}
+
+export async function updateVersion(
+  env: Env,
+  id: string,
+  patch: VersionPatch,
+): Promise<VersionRow | null> {
+  if (isLocalTest(env)) {
+    const version = store.versions.find((item) => item.id === id)
+    if (!version) return null
+    if (patch.active) {
+      store.versions.forEach((item) => {
+        if (item.app_id === version.app_id && item.id !== id) item.active = false
+      })
+    }
+    if (patch.versionName !== undefined) version.version_name = patch.versionName
+    if (patch.versionCode !== undefined) version.version_code = patch.versionCode
+    if (patch.hasReleaseNotes) version.release_notes = patch.releaseNotes ?? null
+    if (patch.apkKey !== undefined) version.apk_key = patch.apkKey
+    if (patch.sizeBytes !== undefined) version.size_bytes = patch.sizeBytes
+    if (patch.sha256 !== undefined) version.sha256 = patch.sha256
+    if (patch.active !== undefined) version.active = patch.active
+    return version
+  }
+
+  const sql = db(env)
+  await ensureSchema(env)
+  const existing = (await sql`SELECT * FROM versions WHERE id::text = ${id}::text LIMIT 1`) as unknown as VersionRow[]
+  const current = existing[0]
+  if (!current) return null
+  if (patch.active) {
+    await sql`UPDATE versions SET active = false WHERE app_id = ${current.app_id} AND id::text <> ${id}::text AND active = true`
+  }
+  const nextNotes = patch.hasReleaseNotes ? (patch.releaseNotes ?? null) : current.release_notes
+  const rows = (await sql`
+    UPDATE versions SET
+      version_name = COALESCE(${patch.versionName ?? null}, version_name),
+      version_code = COALESCE(${patch.versionCode ?? null}, version_code),
+      release_notes = ${nextNotes},
+      apk_key = COALESCE(${patch.apkKey ?? null}, apk_key),
+      size_bytes = COALESCE(${patch.sizeBytes ?? null}, size_bytes),
+      sha256 = COALESCE(${patch.sha256 ?? null}, sha256),
+      active = COALESCE(${patch.active ?? null}, active)
+    WHERE id::text = ${id}::text
+    RETURNING *
+  `) as unknown as VersionRow[]
+  return rows[0] ? { ...rows[0], size_bytes: Number(rows[0].size_bytes) } : null
+}
+
 export async function appExists(env: Env, appId: string): Promise<boolean> {
   if (isLocalTest(env)) return store.apps.some((app) => app.id === appId)
   const rows = (await db(env)`SELECT 1 AS ok FROM apps WHERE id = ${appId} LIMIT 1`) as unknown as unknown[]

@@ -158,6 +158,34 @@ const createdVersion = await req('/api/admin/versions', {
 expect(createdVersion, 201)
 assert.equal(createdVersion.data.version.active, true)
 
+const SHA2 = 'b'.repeat(64)
+const patchedVersion = await req(`/api/admin/versions/${createdVersion.data.version.id}`, {
+  headers: ADMIN,
+  method: 'PATCH',
+  body: {
+    versionName: '1.0.1',
+    releaseNotes: '- Perbaikan cepat\n- Ganti berkas APK',
+    apkKey: 'apps/new-app/new-app-1.0.1.apk',
+    sizeBytes: 2048,
+    sha256: SHA2,
+  },
+})
+expect(patchedVersion, 200)
+assert.equal(patchedVersion.data.version.version_name, '1.0.1')
+assert.equal(patchedVersion.data.version.apk_key, 'apps/new-app/new-app-1.0.1.apk')
+assert.equal(patchedVersion.data.version.size_bytes, 2048)
+assert.equal(patchedVersion.data.version.sha256, SHA2)
+assert.match(patchedVersion.data.version.release_notes, /Perbaikan cepat/)
+expect(
+  await req('/api/admin/versions/00000000-0000-4000-8000-000000000000', {
+    headers: ADMIN,
+    method: 'PATCH',
+    body: { releaseNotes: 'x' },
+  }),
+  404,
+  'E-NOTFOUND',
+)
+
 const screenshot = await req(`/api/admin/upload-screenshot/${createdApp.data.app.id}`, {
   headers: ADMIN,
   method: 'POST',
