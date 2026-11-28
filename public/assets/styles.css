@@ -405,6 +405,12 @@ h1, h2, h3, p { margin: 0; }
   width: 5px; height: 5px; border-radius: 50%; background: rgba(237, 237, 237, 0.55);
 }
 .changelog-lead { color: var(--text); font-weight: 500; }
+.changelog-link {
+  color: var(--text); text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-color: rgba(237, 237, 237, 0.42); word-break: break-word;
+  transition: text-decoration-color 160ms var(--ease), opacity 160ms var(--ease);
+}
+.changelog-link:hover { text-decoration-color: var(--text); opacity: 0.9; }
 .changelog-more {
   border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--card);
   padding: 0 14px;

@@ -609,6 +609,28 @@ export function formatChangelog(raw) {
   return out.join('\n')
 }
 
+function linkifyText(raw) {
+  const urlRe = /https?:\/\/[^\s<>"']+/gi
+  let out = ''
+  let last = 0
+  for (const match of String(raw || '').matchAll(urlRe)) {
+    const start = match.index ?? 0
+    out += esc(raw.slice(last, start))
+    let url = match[0]
+    let trail = ''
+    while (url.length && /[.,;:!?)]$/.test(url)) {
+      if (url.endsWith(')') && (url.match(/\(/g) || []).length >= (url.match(/\)/g) || []).length) break
+      trail = url.slice(-1) + trail
+      url = url.slice(0, -1)
+    }
+    const safeUrl = esc(url)
+    out += `<a class="changelog-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>${esc(trail)}`
+    last = start + match[0].length
+  }
+  out += esc(raw.slice(last))
+  return out
+}
+
 export function renderChangelogHtml(raw) {
   const formatted = formatChangelog(raw)
   if (!formatted) return '<p class="body muted">Tanpa catatan rilis.</p>'
@@ -627,8 +649,8 @@ export function renderChangelogHtml(raw) {
       const idx = body.indexOf(':')
       const hasLead = idx > 1 && idx <= 64 && body.slice(idx + 1).trim().length > 0 && !/^https?$/i.test(body.slice(0, idx))
       const content = hasLead
-        ? `<strong class="changelog-lead">${esc(body.slice(0, idx))}</strong>: ${esc(body.slice(idx + 1).trim())}`
-        : esc(body)
+        ? `<strong class="changelog-lead">${esc(body.slice(0, idx))}</strong>: ${linkifyText(body.slice(idx + 1).trim())}`
+        : linkifyText(body)
       items.push(`<li>${content}</li>`)
     } else {
       flush()
