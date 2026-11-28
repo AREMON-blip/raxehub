@@ -72,11 +72,19 @@ h1, h2, h3, p { margin: 0; }
 }
 .nav.is-scrolled::after { opacity: 1; }
 .nav-inner { height: 100%; display: flex; align-items: stretch; gap: 0; }
-.nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; height: 100%; }
+.nav-grid { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; height: 100%; }
+.nav-pill {
+  position: absolute; top: 8px; bottom: 8px; left: 0; width: 0;
+  border-radius: 8px; background: rgba(237, 237, 237, 0.08);
+  border: 1px solid rgba(237, 237, 237, 0.14);
+  pointer-events: none; opacity: 0; z-index: 0;
+  transition: opacity 180ms var(--ease); will-change: transform, width;
+}
 .nav-link {
+  position: relative; z-index: 1;
   display: inline-flex; align-items: center; justify-content: center;
   min-height: 48px; color: var(--secondary); font-size: 0.875rem;
-  position: relative; background: none; border: 0; cursor: pointer;
+  background: none; border: 0; cursor: pointer;
   transition: color 160ms var(--ease);
 }
 .nav-link:hover { color: var(--text); }
@@ -224,14 +232,51 @@ h1, h2, h3, p { margin: 0; }
 }
 .hero:hover .hero-glow { opacity: 1; }
 .hero-ghost {
-  position: absolute; inset: 0; display: grid; align-content: center; gap: 12px;
-  pointer-events: none; user-select: none; overflow: hidden; opacity: 0.06;
+  position: absolute; inset: 0; display: grid; align-content: center; gap: 10px;
+  pointer-events: none; user-select: none; overflow: hidden; opacity: 0.065;
+  will-change: transform;
 }
 .ghost-line {
   font: 500 clamp(3.5rem, 13vw, 9rem)/0.92 var(--font); letter-spacing: -0.04em;
-  white-space: nowrap; color: var(--text);
+  white-space: nowrap; color: var(--text); display: flex; width: max-content;
+  will-change: transform;
 }
-.ghost-b { justify-self: end; }
+.ghost-seq { display: inline-flex; align-items: center; gap: 0.45em; padding-right: 0.45em; }
+.ghost-b { justify-self: start; }
+@media (prefers-reduced-motion: no-preference) {
+  .ghost-a.is-stream { animation: raxehub-ghost-left 34s linear infinite; }
+  .ghost-b.is-stream { animation: raxehub-ghost-right 38s linear infinite; }
+  @keyframes raxehub-ghost-left {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+  @keyframes raxehub-ghost-right {
+    from { transform: translate3d(-50%, 0, 0); }
+    to { transform: translate3d(0, 0, 0); }
+  }
+}
+.constellation-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+.eyebrow-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.kinetic-role {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 24px; padding: 0 10px; border-radius: 999px;
+  background: rgba(237, 237, 237, 0.06); border: 1px solid rgba(237, 237, 237, 0.16);
+  color: var(--text); font: 400 0.6875rem/1 var(--mono); letter-spacing: 0.04em;
+  cursor: pointer; transition: border-color 180ms var(--ease), background-color 180ms var(--ease);
+}
+.kinetic-role:hover { border-color: rgba(237, 237, 237, 0.4); background: rgba(237, 237, 237, 0.11); }
+.kinetic-role::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%;
+  background: #38BDF8; box-shadow: 0 0 8px rgba(56, 189, 248, 0.75);
+}
+.char-in { cursor: default; }
+.hero-tagline, .page-hero .lead {
+  transition: color 220ms var(--ease);
+}
+.hero-tagline.is-lit, .page-hero .lead.is-lit { color: var(--text); }
 .scroll-progress {
   position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
   background: var(--text); opacity: 0.65; transform-origin: 0 50%;
@@ -505,5 +550,5 @@ textarea { min-height: 96px; resize: vertical; }
   .mark-in { opacity: 0; transform: none; }
   .mark-in.is-in { opacity: 1; transform: none; }
   .mark-in svg > g { opacity: 1; transform: none; transition: none; }
-  .plate, .hero-ghost, .hero-glow, .hero-grid, .hero-sparks, .scroll-progress { display: none; }
+  .plate, .hero-ghost, .hero-glow, .hero-grid, .hero-sparks, .constellation-canvas, .nav-pill, .scroll-progress { display: none; }
 }

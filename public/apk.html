@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/assets/styles.css">
+  <link rel="stylesheet" href="/assets/styles.css?v=3">
   <script src="/config"></script>
 </head>
 <body data-page="apk">
@@ -25,7 +25,10 @@
         <span class="ghost-line ghost-b">APK SHELF</span>
       </div>
       <div class="page-hero-inner">
-        <span class="label">RAK / ANDROID</span>
+        <div class="eyebrow-row">
+          <span class="label">RAK / ANDROID</span>
+          <button class="kinetic-role" type="button" data-roles="Direct APK|SHA256 Verified|Zero Store Bloat|Live Changelog" aria-label="Highlight APK">Direct APK</button>
+        </div>
         <h1 class="h1" style="margin-top:12px">APK</h1>
         <div class="tentang-line" style="margin-top:14px" aria-hidden="true"></div>
         <p class="lead" style="margin-top:14px">Buka detail untuk melihat rilis, integritas berkas, dan catatan instalasi.</p>
@@ -34,6 +37,6 @@
     <section class="section wrap" id="catalog" aria-live="polite"></section>
   </main>
   <div id="footer-mount"></div>
-  <script type="module" src="/assets/app.js"></script>
+  <script type="module" src="/assets/app.js?v=3"></script>
 </body>
 </html>
