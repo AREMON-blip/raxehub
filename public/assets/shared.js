@@ -610,7 +610,7 @@ export function formatChangelog(raw) {
 }
 
 function linkifyText(raw) {
-  const urlRe = /https?:\/\/[^\s<>"']+/gi
+  const urlRe = /(?:https?:\/\/[^\s<>"']+|(?<![@\w/.])(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|net|org|io|dev|app|co\.id|web\.id|my\.id|ac\.id|or\.id|id|xyz|me|gg|ai|tech|site|online|cloud|pages\.dev|vercel\.app|netlify\.app|github\.io)(?:\/[^\s<>"']*)?(?![\w-]))/gi
   let out = ''
   let last = 0
   for (const match of String(raw || '').matchAll(urlRe)) {
@@ -623,8 +623,8 @@ function linkifyText(raw) {
       trail = url.slice(-1) + trail
       url = url.slice(0, -1)
     }
-    const safeUrl = esc(url)
-    out += `<a class="changelog-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeUrl}</a>${esc(trail)}`
+    const href = /^https?:\/\//i.test(url) ? url : `https://${url}`
+    out += `<a class="changelog-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>${esc(trail)}`
     last = start + match[0].length
   }
   out += esc(raw.slice(last))
